@@ -1,0 +1,12 @@
+Versions Supported:
+
+Unity version 2019.4.2f1 and up
+HDRP version 7.5.2 and up
+URP 7.5.2 and up
+
+
+If you use HDRP 7.5.2 up to 10.x, you have to unpack the HDRP_v7.5.2 package only.
+
+If you use HDRP 10.x, you have to unpack the HDRP_v7.5.2 package and then import the HDRP_v10+ package.
+
+If you use URP 7.5.2 and up, you have to unpack the URP package.

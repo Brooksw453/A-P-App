@@ -1,0 +1,300 @@
+fileFormatVersion: 2
+guid: b21b8e491cbb3fd409653517e654477a
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: CableHanging
+    100002: CableHanging_mesh
+    100004: Column_end
+    100006: Column_mesh
+    100008: Column_start
+    100010: End
+    100012: End_parent
+    100014: EndBeam_01
+    100016: EndBeam_01_wheel_01
+    100018: EndBeam_01_wheel_02
+    100020: EndBeam_02
+    100022: EndBeam_02_wheel_01
+    100024: EndBeam_02_wheel_02
+    100026: EndBeams
+    100028: EndBeams_mesh
+    100030: MainBeam_end
+    100032: MainBeam_mesh
+    100034: MainBeam_start
+    100036: //RootNode
+    100038: OverheadCrane_wires
+    100040: Start
+    100042: Start_parent
+    100044: SupportBeam_01_end
+    100046: SupportBeam_01_start
+    100048: SupportBeam_02_end
+    100050: SupportBeam_02_start
+    100052: SupportBeams
+    100054: SupportBeams_mesh
+    100056: Telpher
+    100058: Telpher_drum
+    100060: Telpher_fan
+    100062: Telpher_mesh
+    100064: Telpher_wheel_01
+    100066: Telpher_wheel_02
+    100068: Telpher_wheel_03
+    100070: Telpher_wireHolder
+    100072: Hook
+    100074: WireDrumMount
+    100076: WireHookMount
+    100078: Wires
+    100080: Wires_mesh
+    100082: Column_decal
+    100084: MainBeam_decal
+    100086: Button_back
+    100088: Button_down
+    100090: Button_front
+    100092: Button_left
+    100094: Button_right
+    100096: Button_up
+    100098: Buttons
+    100100: Buttons 1
+    100102: Remote
+    100104: Remote_mesh
+    100106: Buttons_mesh
+    100108: CableHanging001
+    100110: CableHanging_mesh001
+    100112: End001
+    100114: End_parent001
+    100116: RemoteAndPower_cable
+    100118: Start001
+    100120: Start_parent001
+    100122: Telpher_mesh_LOD0
+    100124: Telpher_mesh_LOD1
+    100126: Cable_remoteMount
+    100128: Cable_topMount
+    100130: CableRemote
+    400000: CableHanging
+    400002: CableHanging_mesh
+    400004: Column_end
+    400006: Column_mesh
+    400008: Column_start
+    400010: End
+    400012: End_parent
+    400014: EndBeam_01
+    400016: EndBeam_01_wheel_01
+    400018: EndBeam_01_wheel_02
+    400020: EndBeam_02
+    400022: EndBeam_02_wheel_01
+    400024: EndBeam_02_wheel_02
+    400026: EndBeams
+    400028: EndBeams_mesh
+    400030: MainBeam_end
+    400032: MainBeam_mesh
+    400034: MainBeam_start
+    400036: //RootNode
+    400038: OverheadCrane_wires
+    400040: Start
+    400042: Start_parent
+    400044: SupportBeam_01_end
+    400046: SupportBeam_01_start
+    400048: SupportBeam_02_end
+    400050: SupportBeam_02_start
+    400052: SupportBeams
+    400054: SupportBeams_mesh
+    400056: Telpher
+    400058: Telpher_drum
+    400060: Telpher_fan
+    400062: Telpher_mesh
+    400064: Telpher_wheel_01
+    400066: Telpher_wheel_02
+    400068: Telpher_wheel_03
+    400070: Telpher_wireHolder
+    400072: Hook
+    400074: WireDrumMount
+    400076: WireHookMount
+    400078: Wires
+    400080: Wires_mesh
+    400082: Column_decal
+    400084: MainBeam_decal
+    400086: Button_back
+    400088: Button_down
+    400090: Button_front
+    400092: Button_left
+    400094: Button_right
+    400096: Button_up
+    400098: Buttons
+    400100: Buttons 1
+    400102: Remote
+    400104: Remote_mesh
+    400106: Buttons_mesh
+    400108: CableHanging001
+    400110: CableHanging_mesh001
+    400112: End001
+    400114: End_parent001
+    400116: RemoteAndPower_cable
+    400118: Start001
+    400120: Start_parent001
+    400122: Telpher_mesh_LOD0
+    400124: Telpher_mesh_LOD1
+    400126: Cable_remoteMount
+    400128: Cable_topMount
+    400130: CableRemote
+    2100000: OverheadCrane_beams
+    2100002: OverheadCrane
+    2100004: OverheadCrane_wires
+    2300000: OverheadCrane_wires
+    2300002: Hook
+    2300004: Column_decal
+    2300006: MainBeam_decal
+    2300008: RemoteAndPower_cable
+    2300010: Telpher_mesh_LOD1
+    3300000: OverheadCrane_wires
+    3300002: Hook
+    3300004: Column_decal
+    3300006: MainBeam_decal
+    3300008: RemoteAndPower_cable
+    3300010: Telpher_mesh_LOD1
+    4300000: SupportBeams_mesh
+    4300002: MainBeam_mesh
+    4300004: EndBeams_mesh
+    4300006: CableHanging_mesh
+    4300008: Telpher_mesh
+    4300010: Column_mesh
+    4300012: OverheadCrane_wires
+    4300014: Hook
+    4300016: Wires_mesh
+    4300018: MainBeam_decal
+    4300020: Column_decal
+    4300022: Remote_mesh
+    4300024: Buttons
+    4300026: Buttons_mesh
+    4300028: CableHanging_mesh001
+    4300030: RemoteAndPower_cable
+    4300032: Telpher_mesh_LOD0
+    4300034: Telpher_mesh_LOD1
+    4300036: CableRemote
+    9500000: //RootNode
+    13700000: CableHanging_mesh
+    13700002: Column_mesh
+    13700004: EndBeams_mesh
+    13700006: MainBeam_mesh
+    13700008: SupportBeams_mesh
+    13700010: Telpher_mesh
+    13700012: Wires_mesh
+    13700014: Buttons
+    13700016: Remote_mesh
+    13700018: Buttons_mesh
+    13700020: CableHanging_mesh001
+    13700022: Telpher_mesh_LOD0
+    13700024: Telpher_mesh_LOD1
+    13700026: CableRemote
+    20500000: //RootNode
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Decals
+    second: {fileID: 2100000, guid: 58f0b4b6a2eb0d54caa355e2578ef9f8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OverheadCrane
+    second: {fileID: 2100000, guid: 1a3cb8e9d66f76b42be8e179c1d39483, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OverheadCrane_beams
+    second: {fileID: 2100000, guid: f46efe60591987f4789e3234dbde2424, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OverheadCrane_remoteButtons
+    second: {fileID: 2100000, guid: b1234fd23075aad46830c3d59eb1071c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OverheadCrane_wires
+    second: {fileID: 2100000, guid: e995eb359ed14734dad6ee4fd997d20e, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 1
+    materialSearch: 1
+    materialLocation: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages:
+    - 0.25
+    - 0.01
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.01
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
