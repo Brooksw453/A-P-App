@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Hearts
+  - enemy
+  - SmallScrew
+  - SmallTool
+  - Left Tibia
   layers:
   - Default
   - TransparentFX
