@@ -9049,7 +9049,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &201441303
 Transform:
   m_ObjectHideFlags: 0
@@ -16992,6 +16992,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &374522078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374522071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7eb4e6d264753a46a2accfaae924042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  socketName: Femur 2
+  connectedBone: {fileID: 374522071}
 --- !u!1 &375123697
 GameObject:
   m_ObjectHideFlags: 0
@@ -30213,6 +30227,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &691029323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 691029316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7eb4e6d264753a46a2accfaae924042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  socketName: 
+  connectedBone: {fileID: 0}
 --- !u!1001 &691032629
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -103508,6 +103536,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &2072977478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2072977471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7eb4e6d264753a46a2accfaae924042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  socketName: Skull
+  connectedBone: {fileID: 2072977471}
 --- !u!1 &2076688868
 GameObject:
   m_ObjectHideFlags: 0
