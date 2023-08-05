@@ -2995,10 +2995,10 @@ MonoBehaviour:
   m_SelectEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1155204929}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 170264205}
+        m_TargetAssemblyTypeName: SocketController, Assembly-CSharp
+        m_MethodName: ReactivateThirdObject
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3010,10 +3010,10 @@ MonoBehaviour:
   m_SelectExited:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1155204929}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 170264205}
+        m_TargetAssemblyTypeName: SocketController, Assembly-CSharp
+        m_MethodName: DeactivateThirdObject
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -8011,6 +8011,7 @@ GameObject:
   - component: {fileID: 170264201}
   - component: {fileID: 170264200}
   - component: {fileID: 170264204}
+  - component: {fileID: 170264205}
   m_Layer: 0
   m_Name: Frontal Bone Socket
   m_TagString: Untagged
@@ -8045,8 +8046,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 8.760652, y: 3.7212853, z: 7.6361327}
-  m_Center: {x: -0.4536811, y: -5.0936894, z: 0.652486}
+  m_Size: {x: 8.760652, y: 3.1960783, z: 7.6361327}
+  m_Center: {x: -0.45368108, y: -4.831089, z: 0.65249056}
 --- !u!114 &170264201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8110,16 +8111,28 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 170264198}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46214e46ad6b0214c8c75bd85ae841d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   objectToCheck: {fileID: 1516286650}
-  objectHeld: {fileID: 1516286650}
   isObjectInSocket: 0
-  isObjectHeld: 0
   objectToDeactivate: {fileID: 1155204929}
+--- !u!114 &170264205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 170264198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 565991aef2f153a47ac58c055a9f2718, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectToDetect: {fileID: 1516286650}
+  thirdObject: {fileID: 1155204929}
 --- !u!1001 &170632160
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -75353,6 +75366,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2678911132636038147, guid: 13d476b8ae63f644083dee95c5893eaa,
+        type: 3}
+      propertyPath: m_TagString
+      value: Frontal Bone
       objectReference: {fileID: 0}
     - target: {fileID: 4280075622168794208, guid: 13d476b8ae63f644083dee95c5893eaa,
         type: 3}
