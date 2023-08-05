@@ -11,6 +11,7 @@ public class SocketController : MonoBehaviour
     private bool isObjectInSocket = false;
     private bool isObjectGrabbed = false;
     private bool isObjectSelected = false;
+    private bool isTurningOffThirdObject = false;
 
     private void Update()
     {
@@ -18,12 +19,23 @@ public class SocketController : MonoBehaviour
         if (isObjectInSocket || isObjectGrabbed || isObjectSelected)
         {
             thirdObject.SetActive(false);
+            isTurningOffThirdObject = false;
         }
         // If the object is not in the socket, grabbed, or selected, turn on the third object
         else
         {
-            thirdObject.SetActive(true);
+            if (!isTurningOffThirdObject)
+            {
+                StartCoroutine(TurnOnThirdObjectDelayed());
+            }
         }
+    }
+
+    private System.Collections.IEnumerator TurnOnThirdObjectDelayed()
+    {
+        isTurningOffThirdObject = true;
+        yield return new WaitForSeconds(0.1f); // Adjust the delay time as needed
+        thirdObject.SetActive(true);
     }
 
     public void DeactivateThirdObject()
@@ -33,16 +45,23 @@ public class SocketController : MonoBehaviour
 
     public void ReactivateThirdObject()
     {
-        // If the object is not in the socket, grabbed, or selected, turn on the third object
-        if (!isObjectInSocket && !isObjectGrabbed && !isObjectSelected)
-        {
-            thirdObject.SetActive(true);
-        }
+        thirdObject.SetActive(true);
     }
 
     public void ObjectGrabbed(bool isGrabbed)
     {
         isObjectGrabbed = isGrabbed;
+
+        // If the object is grabbed, set it as selected as well
+        if (isGrabbed)
+        {
+            ObjectSelected(true);
+        }
+        // If the object is released or let go, mark it as not selected
+        else
+        {
+            ObjectSelected(false);
+        }
     }
 
     public void ObjectSelected(bool isSelected)
