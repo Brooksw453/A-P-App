@@ -18,7 +18,7 @@ float ReflectionFresnel(float3 worldNormal, float3 viewDir, float exponent)
 	return pow(max(0.0, AIR_RI - cosTheta), exponent);
 }
 
-TEXTURE2D(_PlanarReflection);
+TEXTURE2D_X(_PlanarReflection);
 SAMPLER(sampler_PlanarReflection);
 
 float3 SampleReflections(float3 reflectionVector, float smoothness, float mask, float4 screenPos, float3 positionWS, float3 normal, float3 viewDir, float2 pixelOffset)
@@ -37,8 +37,7 @@ float3 SampleReflections(float3 reflectionVector, float smoothness, float mask, 
 	#endif
 
 	#if !_RIVER //Planar reflections are pointless on curved surfaces, skip	
-	float4 planarReflections = SAMPLE_TEXTURE2D(_PlanarReflection, sampler_PlanarReflection, screenPos.xy);
-	
+	float4 planarReflections = SAMPLE_TEXTURE2D_X_LOD(_PlanarReflection, sampler_PlanarReflection, screenPos.xy, 0);
 	//Terrain add-pass can output negative alpha values. Clamp as a safeguard against this
 	planarReflections.a = saturate(planarReflections.a);
 	
@@ -63,19 +62,20 @@ struct TranslucencyData
 
 };
 
-TranslucencyData PopulateTranslucencyData(float3 subsurfaceColor, float3 lightDir, float3 lightColor, float3 viewDir, float3 WorldNormal, float3 worldTangentNormal, float mask, float strength, float exponent, float offet)
+TranslucencyData PopulateTranslucencyData(float3 subsurfaceColor, float3 lightDir, float3 lightColor, float3 viewDir, float3 WorldNormal, float3 worldTangentNormal, float mask, float strength, float exponent, float offset)
 {
 	TranslucencyData d = (TranslucencyData)0;
 	d.subsurfaceColor = subsurfaceColor;
 	d.lightColor = lightColor;
 	d.lightDir = lightDir;
-	
+
 	#if _ADVANCED_SHADING
-	d.normal = lerp(WorldNormal, worldTangentNormal, 0.2);
+	//Slightly include high frequency details
+	d.normal = normalize(WorldNormal + (worldTangentNormal * 0.1));
 	#else
 	d.normal = WorldNormal;
 	#endif
-	d.curvature = offet;
+	d.curvature = offset;
 	d.mask = mask; //Shadows, foam, intersection, etc
 	d.strength = strength;
 	d.viewDir = viewDir;
@@ -98,17 +98,17 @@ float3 BlendOverlay(float3 a, float3 b)
 
 void ApplyTranslucency(float3 subsurfaceColor, float3 lightDir, float3 lightColor, float3 viewDir, float3 normal, float mask, float strength, float exponent, float offset, inout float3 emission)
 {
-	#if _TRANSLUCENCY
-
 	float attenuation = 1;
-
-	//Perturb the light vector towards the normal. Pushes the effect towards the rim of the surface
-	const float3 lightHalfVec = normalize(lightDir + (normal * offset));
+	
 	//Coefficient describing how much the surface orientation is between the camera and the direction of/to the light  
-	float VdotL = saturate(dot(-viewDir, lightHalfVec));
+	float VdotL = saturate(dot(-viewDir, lightDir));
 	//Exponentiate to tighten the falloff
 	VdotL = saturate(pow(VdotL, exponent));
 
+	//Mask by normals facing away from the light (backfaces, in light-space)
+	half curvature = saturate(lerp(1.0, dot(normal, -lightDir), offset));
+	VdotL *= curvature;
+	
 	#if _ADVANCED_SHADING
 	//Fade the effect out as the sun approaches the horizon (80 to 90 degrees)
 	half sunAngle = saturate(dot(float3(0, 1, 0), lightDir));
@@ -130,8 +130,6 @@ void ApplyTranslucency(float3 subsurfaceColor, float3 lightDir, float3 lightColo
 	
 	emission += lerp(emission, subsurfaceColor, attenuation);
 #endif
-
-	#endif
 }
 
 void ApplyTranslucency(TranslucencyData translucencyData, inout float3 emission)
@@ -156,7 +154,7 @@ float3 SpecularReflection(Light light, float3 viewDirectionWS, float3 geometryNo
 	//Blend between geometry/wave normals and normals from normal map (aka distortion)
 	normalWS = lerp(geometryNormalWS, normalWS, perturbation);
 
-	const float3 halfVec = SafeNormalize(light.direction + viewDirectionWS + (normalWS * perturbation));
+	const float3 halfVec = normalize(light.direction + viewDirectionWS + (normalWS * perturbation));
 	half NdotH = saturate(dot(geometryNormalWS, halfVec));
 
 	float specular = pow(NdotH, exponent);
@@ -191,7 +189,7 @@ float3 ApplyLighting(inout SurfaceData surfaceData, inout float3 sceneColor, Lig
 	#endif
 	
 #ifdef LIT
-	#if _CAUSTICS
+	#if _CAUSTICS && !defined(LIGHTMAP_ON)
 	causticsAttentuation = GetLightIntensity(mainLight) * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
 	#endif
 	
@@ -246,6 +244,7 @@ float3 ApplyLighting(inout SurfaceData surfaceData, inout float3 sceneColor, Lig
 			translucencyData.lightDir = light.direction;
 			translucencyData.lightColor = light.color * light.distanceAttenuation;
 			translucencyData.strength *= light.shadowAttenuation;
+			translucencyData.exponent *= light.distanceAttenuation;
 				
 			ApplyTranslucency(translucencyData, surfaceData.emission.rgb);
 			#endif

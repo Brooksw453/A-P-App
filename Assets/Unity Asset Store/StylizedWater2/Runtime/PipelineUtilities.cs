@@ -2,10 +2,12 @@
 //Staggart Creations (http://staggart.xyz)
 //Copyright protected under Unity Asset Store EULA
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Rendering;
 #if URP
 using UnityEngine.Rendering.Universal;
 
@@ -21,30 +23,25 @@ using UnityEditor;
 
 namespace StylizedWater2
 {
-	//Stay awesome Unity, locking everything behind internal UI code won't stop us, just makes it convoluted
+	//Stay awesome Unity, locking everything behind internal UI code just makes things convoluted.
     public static class PipelineUtilities
     {
         private const string renderDataListFieldName = "m_RendererDataList";
+        private const string renderFeaturesListFieldName = "m_RendererFeatures";
         
 #if URP
-        /// <summary>
-        /// Retrieves a ForwardRenderer asset in the project, based on GUID
-        /// </summary>
-        /// <param name="assetName"></param>
-        /// <returns></returns>
-        public static ForwardRendererData GetRenderer(string GUID)
+        private static ScriptableRendererData[] GetRenderDataList(UniversalRenderPipelineAsset asset)
         {
-#if UNITY_EDITOR
-            string assetPath = AssetDatabase.GUIDToAssetPath(GUID);
-            ForwardRendererData renderer = (ForwardRendererData)AssetDatabase.LoadAssetAtPath(assetPath, typeof(ForwardRendererData));
+            FieldInfo renderDataListField = typeof(UniversalRenderPipelineAsset).GetField(renderDataListFieldName, BindingFlags.NonPublic | BindingFlags.Instance);
 
-            return renderer;
-#else
-            Debug.LogError("PipelineUtilities.GetRenderer() cannot be called in a build, it requires AssetDatabase. References to renderers should be saved beforehand!");
-            return null;
-#endif
+            if (renderDataListField != null)
+            {
+                return (ScriptableRendererData[])renderDataListField.GetValue(asset);
+            }
+
+            throw new Exception("Reflection failed on field \"m_RendererDataList\" from class \"UniversalRenderPipelineAsset\". URP API likely changed");
         }
-
+        
         public static void RefreshRendererList()
         {
             if (UniversalRenderPipeline.asset == null)
@@ -52,7 +49,7 @@ namespace StylizedWater2
                 Debug.LogError("No pipeline is active, do not display UI that uses this function if it isn't!");
             }
             
-            ScriptableRendererData[] m_rendererDataList = (ScriptableRendererData[]) typeof(UniversalRenderPipelineAsset).GetField(renderDataListFieldName, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(UniversalRenderPipeline.asset);
+            ScriptableRendererData[] m_rendererDataList = GetRenderDataList(UniversalRenderPipeline.asset);
               
             //Display names
             _rendererDisplayList = new GUIContent[m_rendererDataList.Length+1];
@@ -81,10 +78,6 @@ namespace StylizedWater2
                 if (_rendererDisplayList == null) RefreshRendererList();
                 return _rendererDisplayList;
             }
-            set
-            {
-                _rendererDisplayList = value;
-            }
         }
 
         private static int[] _rendererIndexList;
@@ -94,10 +87,6 @@ namespace StylizedWater2
             {
                 if (_rendererIndexList == null) RefreshRendererList();
                 return _rendererIndexList;
-            }
-            set
-            {
-                _rendererIndexList = value;
             }
         }
 
@@ -111,7 +100,7 @@ namespace StylizedWater2
             if (UniversalRenderPipeline.asset)
             {
                 int defaultRendererIndex = GetDefaultRendererIndex(UniversalRenderPipeline.asset);
-                ScriptableRendererData[] m_rendererDataList = (ScriptableRendererData[]) typeof(UniversalRenderPipelineAsset).GetField(renderDataListFieldName, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(UniversalRenderPipeline.asset);
+                ScriptableRendererData[] m_rendererDataList = GetRenderDataList(UniversalRenderPipeline.asset);
                 
                 //-1 is used to indicate the default renderer
                 if (index == -1) index = defaultRendererIndex;
@@ -149,12 +138,7 @@ namespace StylizedWater2
 
             if (UniversalRenderPipeline.asset)
             {
-                BindingFlags bindings =
-                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
-
-                ScriptableRendererData[] m_rendererDataList =
-                    (ScriptableRendererData[]) typeof(UniversalRenderPipelineAsset)
-                        .GetField(renderDataListFieldName, bindings).GetValue(UniversalRenderPipeline.asset);
+                ScriptableRendererData[] m_rendererDataList = GetRenderDataList(UniversalRenderPipeline.asset);
                 bool isPresent = false;
 
                 for (int i = 0; i < m_rendererDataList.Length; i++)
@@ -181,9 +165,7 @@ namespace StylizedWater2
 
             if (UniversalRenderPipeline.asset)
             {
-                BindingFlags bindings = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
-
-                ScriptableRendererData[] m_rendererDataList = (ScriptableRendererData[]) typeof(UniversalRenderPipelineAsset).GetField(renderDataListFieldName, bindings).GetValue(UniversalRenderPipeline.asset);
+                ScriptableRendererData[] m_rendererDataList = GetRenderDataList(UniversalRenderPipeline.asset);
                 List<ScriptableRendererData> rendererDataList = new List<ScriptableRendererData>();
 
                 for (int i = 0; i < m_rendererDataList.Length; i++)
@@ -193,7 +175,7 @@ namespace StylizedWater2
 
                 rendererDataList.Add(renderer);
 
-                typeof(UniversalRenderPipelineAsset).GetField(renderDataListFieldName, bindings).SetValue(UniversalRenderPipeline.asset, rendererDataList.ToArray());
+                typeof(UniversalRenderPipelineAsset).GetField(renderDataListFieldName, BindingFlags.NonPublic | BindingFlags.Instance).SetValue(UniversalRenderPipeline.asset, rendererDataList.ToArray());
 
 #if UNITY_EDITOR
                 EditorUtility.SetDirty(UniversalRenderPipeline.asset);
@@ -218,9 +200,7 @@ namespace StylizedWater2
         {
             if (UniversalRenderPipeline.asset)
             {
-                ScriptableRendererData[] rendererDataList = (ScriptableRendererData[])typeof(UniversalRenderPipelineAsset)
-                        .GetField(renderDataListFieldName, BindingFlags.NonPublic | BindingFlags.Instance)
-                        .GetValue(UniversalRenderPipeline.asset);
+                ScriptableRendererData[] rendererDataList = GetRenderDataList(UniversalRenderPipeline.asset);
                 int defaultRendererIndex = GetDefaultRendererIndex(UniversalRenderPipeline.asset);
 
                 return rendererDataList[defaultRendererIndex];
@@ -238,7 +218,7 @@ namespace StylizedWater2
             
             foreach (ScriptableRendererFeature feature in forwardRenderer.rendererFeatures)
             {
-                if (feature.GetType() == typeof(T)) return feature;
+                if (feature && feature.GetType() == typeof(T)) return feature;
             }
 
             return null;
@@ -272,12 +252,12 @@ namespace StylizedWater2
         /// </summary>
         /// <param name="forwardRenderer"></param>
         /// <typeparam name="T"></typeparam>
-        public static void AddRenderFeature<T>(ScriptableRendererData forwardRenderer = null)
+        public static ScriptableRendererFeature AddRenderFeature<T>(ScriptableRendererData forwardRenderer = null, string name = "")
         {
             if (forwardRenderer == null) forwardRenderer = GetDefaultRenderer();
             
             ScriptableRendererFeature feature = (ScriptableRendererFeature)ScriptableRendererFeature.CreateInstance(typeof(T).ToString());
-            feature.name = typeof(T).ToString();
+            feature.name = name == string.Empty ? typeof(T).ToString() : name;
             
             //Add component https://github.com/Unity-Technologies/Graphics/blob/d0473769091ff202422ad13b7b764c7b6a7ef0be/com.unity.render-pipelines.universal/Editor/ScriptableRendererDataEditor.cs#L180
 #if UNITY_EDITOR
@@ -286,7 +266,7 @@ namespace StylizedWater2
 #endif
 
             //Get feature list
-            FieldInfo renderFeaturesInfo = typeof(ScriptableRendererData).GetField("m_RendererFeatures", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo renderFeaturesInfo = typeof(ScriptableRendererData).GetField(renderFeaturesListFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
             List<ScriptableRendererFeature> m_RendererFeatures = (List<ScriptableRendererFeature>)renderFeaturesInfo.GetValue(forwardRenderer);
 
             //Modify and set list
@@ -303,18 +283,21 @@ namespace StylizedWater2
 #endif
             
             Debug.Log("<b>" + feature.name + "</b> was added to the " + forwardRenderer.name + " renderer");
+
+            return feature;
         }
 
         public static bool IsRenderFeatureEnabled<T>(ScriptableRendererData forwardRenderer = null, bool autoEnable = false)
         {
+            #if UNITY_2020_1_OR_NEWER //Older version doesn't have the isActive property
             if (forwardRenderer == null) forwardRenderer = GetDefaultRenderer();
             
-            FieldInfo renderFeaturesInfo = typeof(ScriptableRendererData).GetField("m_RendererFeatures", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo renderFeaturesInfo = typeof(ScriptableRendererData).GetField(renderFeaturesListFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
             List<ScriptableRendererFeature> m_RendererFeatures = (List<ScriptableRendererFeature>)renderFeaturesInfo.GetValue(forwardRenderer);
 
             foreach (ScriptableRendererFeature feature in m_RendererFeatures)
             {
-                if (feature.GetType() == typeof(T))
+                if (feature && feature.GetType() == typeof(T))
                 {
                     if (feature.isActive == false && autoEnable)
                     {
@@ -328,22 +311,25 @@ namespace StylizedWater2
                     return feature.isActive;
                 }
             }
-
+            #endif
+            
             //Fallback, if it is not even in the list
             return true;
         }
 
         public static void ToggleRenderFeature<T>(bool state)
         {
+            #if UNITY_2020_1_OR_NEWER
             ScriptableRendererData forwardRenderer = GetDefaultRenderer();
             
             foreach (ScriptableRendererFeature feature in forwardRenderer.rendererFeatures)
             {
-                if (feature.GetType() == typeof(T)) feature.SetActive(state);
+                if (feature && feature.GetType() == typeof(T)) feature.SetActive(state);
             }
             
             #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(forwardRenderer);
+            #endif
             #endif
         }
 
@@ -355,17 +341,14 @@ namespace StylizedWater2
             {
                 BindingFlags bindings = BindingFlags.NonPublic | BindingFlags.Instance;
 
-                ScriptableRendererData[] m_rendererDataList =
-                    (ScriptableRendererData[]) typeof(UniversalRenderPipelineAsset)
-                        .GetField(renderDataListFieldName, bindings).GetValue(UniversalRenderPipeline.asset);
+                ScriptableRendererData[] m_rendererDataList = GetRenderDataList(UniversalRenderPipeline.asset);
                 List<ScriptableRendererData> rendererDataList = new List<ScriptableRendererData>(m_rendererDataList);
 
                 if (rendererDataList.Contains(renderer))
                 {
                     rendererDataList.Remove(renderer);
                     
-                    typeof(UniversalRenderPipelineAsset).GetField(renderDataListFieldName, bindings)
-                        .SetValue(UniversalRenderPipeline.asset, rendererDataList.ToArray());
+                    typeof(UniversalRenderPipelineAsset).GetField(renderDataListFieldName, bindings).SetValue(UniversalRenderPipeline.asset, rendererDataList.ToArray());
 
 #if UNITY_EDITOR
                     EditorUtility.SetDirty(UniversalRenderPipeline.asset);
@@ -390,8 +373,7 @@ namespace StylizedWater2
             {
                 if (renderer)
                 {
-                    //list is internal, so perform reflection workaround
-                    ScriptableRendererData[] rendererDataList = (ScriptableRendererData[])typeof(UniversalRenderPipelineAsset).GetField(renderDataListFieldName, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(UniversalRenderPipeline.asset);
+                    ScriptableRendererData[] rendererDataList = GetRenderDataList(UniversalRenderPipeline.asset);
 
                     for (int i = 0; i < rendererDataList.Length; i++)
                     {
@@ -402,6 +384,70 @@ namespace StylizedWater2
             else
             {
                 Debug.LogError("No Universal Render Pipeline is currently active.");
+            }
+        }
+
+        public static bool IsDepthTextureOptionDisabledAnywhere()
+        {
+            bool state = false;
+
+            for (int i = 0; i < GraphicsSettings.allConfiguredRenderPipelines.Length; i++)
+            {
+                if(GraphicsSettings.allConfiguredRenderPipelines[i].GetType() != typeof(UniversalRenderPipelineAsset)) continue;
+                
+                UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)GraphicsSettings.allConfiguredRenderPipelines[i];
+
+                state |= (pipeline.supportsCameraDepthTexture == false);
+            }
+
+            return state;
+        }
+
+        public static void SetDepthTextureOnAllAssets(bool state)
+        {
+            for (int i = 0; i < GraphicsSettings.allConfiguredRenderPipelines.Length; i++)
+            {
+                if(GraphicsSettings.allConfiguredRenderPipelines[i].GetType() != typeof(UniversalRenderPipelineAsset)) continue;
+                
+                UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)GraphicsSettings.allConfiguredRenderPipelines[i];
+
+                #if UNITY_EDITOR
+                if(pipeline.supportsCameraDepthTexture != state) EditorUtility.SetDirty(pipeline);
+                #endif
+                
+                pipeline.supportsCameraDepthTexture = state;
+            }
+        }
+        
+        public static bool IsOpaqueTextureOptionDisabledAnywhere()
+        {
+            bool state = false;
+
+            for (int i = 0; i < GraphicsSettings.allConfiguredRenderPipelines.Length; i++)
+            {
+                if(GraphicsSettings.allConfiguredRenderPipelines[i].GetType() != typeof(UniversalRenderPipelineAsset)) continue;
+                
+                UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)GraphicsSettings.allConfiguredRenderPipelines[i];
+
+                if (pipeline.supportsCameraOpaqueTexture == false) return true;
+            }
+
+            return state;
+        }
+
+        public static void SetOpaqueTextureOnAllAssets(bool state)
+        {
+            for (int i = 0; i < GraphicsSettings.allConfiguredRenderPipelines.Length; i++)
+            {
+                if(GraphicsSettings.allConfiguredRenderPipelines[i].GetType() != typeof(UniversalRenderPipelineAsset)) continue;
+                
+                UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)GraphicsSettings.allConfiguredRenderPipelines[i];
+
+                #if UNITY_EDITOR
+                if(pipeline.supportsCameraOpaqueTexture != state) EditorUtility.SetDirty(pipeline);
+                #endif
+                
+                pipeline.supportsCameraOpaqueTexture = state;
             }
         }
         
@@ -424,6 +470,15 @@ namespace StylizedWater2
             return main.copyDepthMode == CopyDepthMode.AfterTransparents;
             #else
             return true;
+            #endif
+        }
+        
+        public static bool VREnabled()
+        {
+            #if UNITY_2023_2_OR_NEWER
+            return XRSRPSettings.enabled;
+            #else
+            return XRGraphics.enabled;
             #endif
         }
 #endif
