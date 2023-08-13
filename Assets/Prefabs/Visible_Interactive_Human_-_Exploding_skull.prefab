@@ -232,9 +232,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls: []
-  m_ShowInteractableHoverMeshes: 0
-  m_InteractableHoverMeshMaterial: {fileID: 2100000, guid: 6dfcc5454cdfc15439a92430bb99d9a1,
-    type: 2}
+  m_ShowInteractableHoverMeshes: 1
+  m_InteractableHoverMeshMaterial: {fileID: 0}
   m_InteractableCantHoverMeshMaterial: {fileID: 0}
   m_SocketActive: 1
   m_InteractableHoverScale: 1
@@ -364,9 +363,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls: []
-  m_ShowInteractableHoverMeshes: 0
-  m_InteractableHoverMeshMaterial: {fileID: 2100000, guid: 6dfcc5454cdfc15439a92430bb99d9a1,
-    type: 2}
+  m_ShowInteractableHoverMeshes: 1
+  m_InteractableHoverMeshMaterial: {fileID: 0}
   m_InteractableCantHoverMeshMaterial: {fileID: 0}
   m_SocketActive: 1
   m_InteractableHoverScale: 1
@@ -630,9 +628,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls: []
-  m_ShowInteractableHoverMeshes: 0
-  m_InteractableHoverMeshMaterial: {fileID: 2100000, guid: 6dfcc5454cdfc15439a92430bb99d9a1,
-    type: 2}
+  m_ShowInteractableHoverMeshes: 1
+  m_InteractableHoverMeshMaterial: {fileID: 0}
   m_InteractableCantHoverMeshMaterial: {fileID: 0}
   m_SocketActive: 1
   m_InteractableHoverScale: 1
@@ -762,9 +759,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls: []
-  m_ShowInteractableHoverMeshes: 0
-  m_InteractableHoverMeshMaterial: {fileID: 2100000, guid: 6dfcc5454cdfc15439a92430bb99d9a1,
-    type: 2}
+  m_ShowInteractableHoverMeshes: 1
+  m_InteractableHoverMeshMaterial: {fileID: 0}
   m_InteractableCantHoverMeshMaterial: {fileID: 0}
   m_SocketActive: 1
   m_InteractableHoverScale: 1
@@ -894,9 +890,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls: []
-  m_ShowInteractableHoverMeshes: 0
-  m_InteractableHoverMeshMaterial: {fileID: 2100000, guid: 6dfcc5454cdfc15439a92430bb99d9a1,
-    type: 2}
+  m_ShowInteractableHoverMeshes: 1
+  m_InteractableHoverMeshMaterial: {fileID: 0}
   m_InteractableCantHoverMeshMaterial: {fileID: 0}
   m_SocketActive: 1
   m_InteractableHoverScale: 1
@@ -964,8 +959,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1288421012890227823}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.9224424, y: -0.036345463, z: 0.016476024, w: -0.38406718}
+  m_LocalPosition: {x: -0.248894, y: 5.8813453, z: -0.9607941}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -979,7 +974,7 @@ Transform:
   - {fileID: 1288421012028643029}
   - {fileID: 1288421011971283112}
   - {fileID: 1288421013356110049}
-  m_Father: {fileID: 1381658433798136278}
+  m_Father: {fileID: 7862155597243343276}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1288421013356110048
@@ -1067,9 +1062,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls: []
-  m_ShowInteractableHoverMeshes: 0
-  m_InteractableHoverMeshMaterial: {fileID: 2100000, guid: 6dfcc5454cdfc15439a92430bb99d9a1,
-    type: 2}
+  m_ShowInteractableHoverMeshes: 1
+  m_InteractableHoverMeshMaterial: {fileID: 0}
   m_InteractableCantHoverMeshMaterial: {fileID: 0}
   m_SocketActive: 1
   m_InteractableHoverScale: 1
@@ -1320,9 +1314,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls: []
-  m_ShowInteractableHoverMeshes: 0
-  m_InteractableHoverMeshMaterial: {fileID: 2100000, guid: 6dfcc5454cdfc15439a92430bb99d9a1,
-    type: 2}
+  m_ShowInteractableHoverMeshes: 1
+  m_InteractableHoverMeshMaterial: {fileID: 0}
   m_InteractableCantHoverMeshMaterial: {fileID: 0}
   m_SocketActive: 1
   m_InteractableHoverScale: 1
@@ -1451,9 +1444,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls: []
-  m_ShowInteractableHoverMeshes: 0
-  m_InteractableHoverMeshMaterial: {fileID: 2100000, guid: 6dfcc5454cdfc15439a92430bb99d9a1,
-    type: 2}
+  m_ShowInteractableHoverMeshes: 1
+  m_InteractableHoverMeshMaterial: {fileID: 0}
   m_InteractableCantHoverMeshMaterial: {fileID: 0}
   m_SocketActive: 1
   m_InteractableHoverScale: 1
@@ -1582,9 +1574,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls: []
-  m_ShowInteractableHoverMeshes: 0
-  m_InteractableHoverMeshMaterial: {fileID: 2100000, guid: 6dfcc5454cdfc15439a92430bb99d9a1,
-    type: 2}
+  m_ShowInteractableHoverMeshes: 1
+  m_InteractableHoverMeshMaterial: {fileID: 0}
   m_InteractableCantHoverMeshMaterial: {fileID: 0}
   m_SocketActive: 1
   m_InteractableHoverScale: 1
@@ -1661,7 +1652,7 @@ Transform:
   m_Children:
   - {fileID: 1288421013422589943}
   m_Father: {fileID: 7862155597243343276}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!33 &1288421013923242209
 MeshFilter:
@@ -1797,9 +1788,8 @@ MonoBehaviour:
   m_OnSelectExited:
     m_PersistentCalls:
       m_Calls: []
-  m_ShowInteractableHoverMeshes: 0
-  m_InteractableHoverMeshMaterial: {fileID: 2100000, guid: 6dfcc5454cdfc15439a92430bb99d9a1,
-    type: 2}
+  m_ShowInteractableHoverMeshes: 1
+  m_InteractableHoverMeshMaterial: {fileID: 0}
   m_InteractableCantHoverMeshMaterial: {fileID: 0}
   m_SocketActive: 1
   m_InteractableHoverScale: 1
@@ -1894,7 +1884,7 @@ Transform:
   - {fileID: 7136592528978164308}
   - {fileID: 6659291556609167227}
   m_Father: {fileID: 1381658433798136278}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1495155295588989301
 GameObject:
@@ -2208,7 +2198,7 @@ Transform:
   - {fileID: 8652676591813038616}
   - {fileID: 3367711887900727280}
   m_Father: {fileID: 1381658433798136278}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1800052297558568769
 GameObject:
@@ -2526,11 +2516,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1288421012890227820}
   - {fileID: 2991215301874505754}
   - {fileID: 3181542274142470426}
   m_Father: {fileID: 7862155597243343276}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2329760916280627923
 GameObject:
@@ -3705,6 +3694,7 @@ Transform:
   m_LocalScale: {x: 0.02, y: 0.02, z: 0.02}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1288421012890227820}
   - {fileID: 1381658433798136278}
   - {fileID: 1288421013923242210}
   m_Father: {fileID: 0}
@@ -3725,7 +3715,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!65 &1288421012319870173
 BoxCollider:
   m_ObjectHideFlags: 0
