@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+
 
 [System.Serializable]
 public class Question
@@ -21,7 +23,7 @@ public class QuizManager : MonoBehaviour
     [SerializeField] private List<Question> questions = new List<Question>();
     private List<Question> selectedQuestions = new List<Question>();
 
-    [SerializeField] private Text scoreText;
+    [SerializeField] private TextMeshProUGUI scoreText;
     private int score = 0;
     private int currentQuestionIndex = 0;
 
@@ -56,6 +58,32 @@ public class QuizManager : MonoBehaviour
 
         selectedQuestions[currentQuestionIndex].QuestionCanvas.SetActive(true);
         currentQuestionIndex++;
+    }
+
+    public void ReloadQuiz()
+    {
+    // 1. Reset score
+    score = 0;
+    UpdateScoreDisplay();
+
+    // 2. Clear selected questions list
+    selectedQuestions.Clear();
+
+    // 3. Shuffle and select new set of 5 random questions
+    Shuffle(questions);
+    for (int i = 0; i < 5; i++)
+    {
+        selectedQuestions.Add(questions[i]);
+    }
+
+    // 4. Reset question index
+    currentQuestionIndex = 0;
+
+    // 5. Display the first question
+    DisplayNextQuestion();
+
+    // Also reset the quizFinished flag
+    quizFinished = false;
     }
 
     public void AnswerQuestion(int userAnswer)
