@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -23,11 +24,23 @@ public class QuizManager : MonoBehaviour
     private List<Question> selectedQuestions = new List<Question>();
 
     [SerializeField] private TextMeshProUGUI scoreText;
+    private bool quizFinished = false;
     private int score = 0;
     private int currentQuestionIndex = 0;
+    public GameObject correctScreen;
+    public GameObject incorrectScreen;
+    public AudioClip correctSound;
+    public AudioClip incorrectSound;
+    private AudioSource audioSource; 
 
     private void Start()
     {
+        audioSource = GetComponent<AudioSource>(); // Ensure you have an AudioSource component attached
+        if (audioSource == null)
+        {
+            gameObject.AddComponent<AudioSource>();
+            audioSource = GetComponent<AudioSource>();
+        }
         InitializeQuiz();
         DisplayNextQuestion();
     }
@@ -45,6 +58,12 @@ public class QuizManager : MonoBehaviour
     public void DisplayNextQuestion()
     {
         if (currentQuestionIndex >= selectedQuestions.Count)
+    {
+        quizFinished = true;  // Update the flag here
+        FinishQuiz();
+        return;
+    }    
+        if (currentQuestionIndex >= selectedQuestions.Count)
         {
             FinishQuiz();
             return;
@@ -61,17 +80,77 @@ public class QuizManager : MonoBehaviour
 
     public void AnswerQuestion(int userAnswer)
     {
-        Question currentQuestion = selectedQuestions[currentQuestionIndex - 1];
+        if (quizFinished) return;
 
+        Question currentQuestion = selectedQuestions[currentQuestionIndex - 1];
+        
         if (userAnswer == currentQuestion.CorrectAnswer)
         {
             score += 20;
             UpdateScoreDisplay();
-            // Assuming you'll implement the userGotItRight property later
-            // currentQuestion.userGotItRight = true;  
+            ShowCorrectAnswerFeedback();
+        }
+        else
+        {
+            ShowIncorrectAnswerFeedback();
         }
 
+        // Wait for 1 second (via coroutine) before displaying the next question
+        StartCoroutine(WaitAndDisplayNext());
+    }
+
+    IEnumerator WaitAndDisplayNext()
+    {
+        yield return new WaitForSeconds(1);
         DisplayNextQuestion();
+    }
+
+    void ShowCorrectAnswerFeedback()
+    {
+        correctScreen.SetActive(true);
+        audioSource.PlayOneShot(correctSound);
+        // Optionally disable the screen after some time
+        StartCoroutine(DisableAfterDelay(correctScreen, 1f));
+    }
+
+    void ShowIncorrectAnswerFeedback()
+    {
+        incorrectScreen.SetActive(true);
+        audioSource.PlayOneShot(incorrectSound);
+        // Optionally disable the screen after some time
+        StartCoroutine(DisableAfterDelay(incorrectScreen, 1f));
+    }
+
+    IEnumerator DisableAfterDelay(GameObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        obj.SetActive(false);
+    }
+
+    public void ReloadQuiz()
+    {
+        // 1. Reset score
+        score = 0;
+        UpdateScoreDisplay();
+
+        // 2. Clear selected questions list
+        selectedQuestions.Clear();
+
+        // 3. Shuffle and select new set of 5 random questions
+        Shuffle(questions);
+        for (int i = 0; i < 5; i++)
+        {
+            selectedQuestions.Add(questions[i]);
+        }
+
+        // 4. Reset question index
+        currentQuestionIndex = 0;
+
+        // 5. Display the first question
+        DisplayNextQuestion();
+
+        // Also reset the quizFinished flag
+        quizFinished = false;
     }
 
     private void UpdateScoreDisplay()
