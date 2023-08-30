@@ -32,6 +32,7 @@ public class QuizManager : MonoBehaviour
     public AudioClip correctSound;
     public AudioClip incorrectSound;
     private AudioSource audioSource; 
+    public GameObject correctAnswerParticleEffect;
 
     private void Start()
     {
@@ -107,10 +108,15 @@ public class QuizManager : MonoBehaviour
 
     void ShowCorrectAnswerFeedback()
     {
-        correctScreen.SetActive(true);
-        audioSource.PlayOneShot(correctSound);
-        // Optionally disable the screen after some time
-        StartCoroutine(DisableAfterDelay(correctScreen, 1f));
+    correctScreen.SetActive(true);
+    audioSource.PlayOneShot(correctSound);
+
+    // Instantiate the particle effect at the correctScreen's position
+    GameObject particleInstance = Instantiate(correctAnswerParticleEffect, correctScreen.transform.position, Quaternion.identity);
+    Destroy(particleInstance, 5f); // Destroy the instance after 5 seconds. Adjust time as needed.
+
+    // Optionally disable the screen after some time
+    StartCoroutine(DisableAfterDelay(correctScreen, 1f));
     }
 
     void ShowIncorrectAnswerFeedback()
@@ -129,28 +135,34 @@ public class QuizManager : MonoBehaviour
 
     public void ReloadQuiz()
     {
-        // 1. Reset score
-        score = 0;
-        UpdateScoreDisplay();
+    // 1. Reset score
+    score = 0;
+    UpdateScoreDisplay();
 
-        // 2. Clear selected questions list
-        selectedQuestions.Clear();
+    // 2. Turn off all currently active questions
+    foreach (var q in selectedQuestions)
+    {
+        q.QuestionCanvas.SetActive(false);
+    }
 
-        // 3. Shuffle and select new set of 5 random questions
-        Shuffle(questions);
-        for (int i = 0; i < 5; i++)
-        {
-            selectedQuestions.Add(questions[i]);
-        }
+    // 3. Clear selected questions list
+    selectedQuestions.Clear();
 
-        // 4. Reset question index
-        currentQuestionIndex = 0;
+    // 4. Shuffle and select new set of 5 random questions
+    Shuffle(questions);
+    for (int i = 0; i < 5; i++)
+    {
+        selectedQuestions.Add(questions[i]);
+    }
 
-        // 5. Display the first question
-        DisplayNextQuestion();
+    // 5. Reset question index
+    currentQuestionIndex = 0;
 
-        // Also reset the quizFinished flag
-        quizFinished = false;
+    // 6. Display the first question
+    DisplayNextQuestion();
+
+    // Also reset the quizFinished flag
+    quizFinished = false;
     }
 
     private void UpdateScoreDisplay()
