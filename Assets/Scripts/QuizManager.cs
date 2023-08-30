@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 [System.Serializable]
 public class Question
@@ -21,7 +22,7 @@ public class QuizManager : MonoBehaviour
     [SerializeField] private List<Question> questions = new List<Question>();
     private List<Question> selectedQuestions = new List<Question>();
 
-    [SerializeField] private Text scoreText;
+    [SerializeField] private TextMeshProUGUI scoreText;
     private int score = 0;
     private int currentQuestionIndex = 0;
 
