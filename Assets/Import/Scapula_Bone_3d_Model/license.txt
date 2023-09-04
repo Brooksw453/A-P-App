@@ -1,0 +1,8 @@
+Model Information:
+* title:	Scapula Bone 3d Model
+* source:	https://sketchfab.com/3d-models/scapula-bone-3d-model-a40e73a99c5c4b5a95268c4a2ab64033
+* author:	Anatomy by Doctor Jana (https://sketchfab.com/docjana)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

@@ -1,0 +1,8 @@
+Model Information:
+* title:	Anatomy - Human vertebrae set
+* source:	https://sketchfab.com/3d-models/anatomy-human-vertebrae-set-f131db0923c54b5eb850391cbc016b64
+* author:	FrancescoMilanese (https://sketchfab.com/FrancescoMilanese)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
