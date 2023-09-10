@@ -33,10 +33,21 @@ public class QuizManager : MonoBehaviour
     public AudioClip incorrectSound;
     private AudioSource audioSource; 
     public GameObject correctAnswerParticleEffect;
+    public static QuizManager ActiveQuiz { get; private set; }
+
 
     private void Start()
     {
-        audioSource = GetComponent<AudioSource>(); // Ensure you have an AudioSource component attached
+        if (ActiveQuiz != null && ActiveQuiz != this)
+    {
+        // Some other quiz is already running
+        Debug.LogWarning("Another quiz is active. Disabling this one.");
+        this.enabled = false;
+        return;
+    }
+
+    ActiveQuiz = this;    
+    audioSource = GetComponent<AudioSource>(); // Ensure you have an AudioSource component attached
         if (audioSource == null)
         {
             gameObject.AddComponent<AudioSource>();
@@ -45,16 +56,30 @@ public class QuizManager : MonoBehaviour
         InitializeQuiz();
         DisplayNextQuestion();
     }
-
-    private void InitializeQuiz()
+    private void Awake()
+{
+    if(ActiveQuiz == null)
     {
-        Shuffle(questions);
-
-        for (int i = 0; i < 5; i++)
-        {
-            selectedQuestions.Add(questions[i]);
-        }
+        ActiveQuiz = this;
     }
+    else
+    {
+        Debug.LogWarning("Multiple quizzes trying to become active. Overriding with latest.");
+        ActiveQuiz = this;
+    }
+}
+ private void InitializeQuiz()
+{
+    Shuffle(questions);
+    Debug.Log("Initializing quiz. Total questions: " + questions.Count);
+
+    for (int i = 0; i < 5; i++)
+    {
+        Debug.Log("Adding question #" + i);
+        selectedQuestions.Add(questions[i]);
+    }
+}
+
 
     public void DisplayNextQuestion()
     {
@@ -154,6 +179,7 @@ public class QuizManager : MonoBehaviour
     {
         selectedQuestions.Add(questions[i]);
     }
+    ActiveQuiz = this;
 
     // 5. Reset question index
     currentQuestionIndex = 0;
@@ -170,9 +196,11 @@ public class QuizManager : MonoBehaviour
         scoreText.text = "Score: " + score;
     }
 
+
     private void FinishQuiz()
     {
-        Debug.Log("Quiz Finished!");
+        ActiveQuiz = null;    
+    Debug.Log("Quiz Finished!");
         // You can expand this later to handle the end of the quiz
     }
 
