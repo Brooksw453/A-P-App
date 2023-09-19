@@ -1,0 +1,523 @@
+fileFormatVersion: 2
+guid: efb10885f6cdc4c0ead2da32d5176fca
+timeCreated: 1507673639
+licenseType: Store
+ModelImporter:
+  serializedVersion: 21
+  fileIDToRecycleName:
+    100000: Bicuspid_Valve1_1
+    100002: Boole_2
+    100004: center
+    100006: down_1
+    100008: down_2
+    100010: Group1_Cube
+    100012: Joint_1
+    100014: Joint_1_2
+    100016: Joint_1_3
+    100018: Joint_1_4
+    100020: Joint_1_5
+    100022: Joint_1_6
+    100024: Joint_2___
+    100026: Joint_2___0
+    100028: Joint_3
+    100030: Joint_3_10
+    100032: Joint_3_11
+    100034: Joint_3_12
+    100036: Joint_3_13
+    100038: Joint_3_2
+    100040: Joint_3_3
+    100042: Joint_3_4
+    100044: Joint_3_5
+    100046: Joint_3_6
+    100048: Joint_3_7
+    100050: Joint_3_8
+    100052: Joint_3_9
+    100054: Joint_5
+    100056: Joint_5_2
+    100058: no_motion
+    100060: no_motion_1b
+    100062: no_motion_2
+    100064: no_motion_2_2
+    100066: no_motion_3
+    100068: no_motion_4
+    100070: no_motion_5
+    100072: NO_MOVE
+    100074: NO_MOVE_2
+    100076: NO_MOVE_3
+    100078: //RootNode
+    100080: peyejo_1
+    100082: peyejo_2
+    100084: Root
+    100086: Root_2
+    100088: Root_oo
+    100090: Skin
+    100092: valve_1
+    100094: valve_1_2
+    100096: no_motion_22
+    100098: Joint_1__1_
+    100100: Joint_2___3_
+    100102: Joint_2_____2_
+    100104: arround
+    100106: arround_2
+    100108: arround_3
+    100110: arround_4
+    100112: final
+    100114: final_2
+    100116: Joint_2
+    100118: Joint_2_2
+    100120: Joint_2_3
+    100122: Joint_2_4
+    100124: Joint_2_5
+    100126: Joint_2_6
+    100128: Joint_2_7
+    100130: MAIN
+    100132: Root_3
+    100134: Skin_2
+    100136: valvle_derecha
+    100138: valvle_izquierda
+    100140: arround_2_2
+    100142: final_abajo
+    100144: arround_2_3
+    100146: arround_5
+    100148: arround_6
+    100150: final_abajo_2
+    100152: heart_all
+    100154: Joint_2_10
+    100156: Joint_2_11
+    100158: Joint_2_12
+    100160: Joint_2_13
+    100162: Joint_2_14
+    100164: Joint_2_8
+    100166: Joint_2_9
+    100168: MAIN_2
+    100170: Root_4
+    100172: Skin_3
+    100174: final_abajo_xx
+    400000: Bicuspid_Valve1_1
+    400002: Boole_2
+    400004: center
+    400006: down_1
+    400008: down_2
+    400010: Group1_Cube
+    400012: Joint_1
+    400014: Joint_1_2
+    400016: Joint_1_3
+    400018: Joint_1_4
+    400020: Joint_1_5
+    400022: Joint_1_6
+    400024: Joint_2___
+    400026: Joint_2___0
+    400028: Joint_3
+    400030: Joint_3_10
+    400032: Joint_3_11
+    400034: Joint_3_12
+    400036: Joint_3_13
+    400038: Joint_3_2
+    400040: Joint_3_3
+    400042: Joint_3_4
+    400044: Joint_3_5
+    400046: Joint_3_6
+    400048: Joint_3_7
+    400050: Joint_3_8
+    400052: Joint_3_9
+    400054: Joint_5
+    400056: Joint_5_2
+    400058: no_motion
+    400060: no_motion_1b
+    400062: no_motion_2
+    400064: no_motion_2_2
+    400066: no_motion_3
+    400068: no_motion_4
+    400070: no_motion_5
+    400072: NO_MOVE
+    400074: NO_MOVE_2
+    400076: NO_MOVE_3
+    400078: //RootNode
+    400080: peyejo_1
+    400082: peyejo_2
+    400084: Root
+    400086: Root_2
+    400088: Root_oo
+    400090: Skin
+    400092: valve_1
+    400094: valve_1_2
+    400096: no_motion_22
+    400098: Joint_1__1_
+    400100: Joint_2___3_
+    400102: Joint_2_____2_
+    400104: arround
+    400106: arround_2
+    400108: arround_3
+    400110: arround_4
+    400112: final
+    400114: final_2
+    400116: Joint_2
+    400118: Joint_2_2
+    400120: Joint_2_3
+    400122: Joint_2_4
+    400124: Joint_2_5
+    400126: Joint_2_6
+    400128: Joint_2_7
+    400130: MAIN
+    400132: Root_3
+    400134: Skin_2
+    400136: valvle_derecha
+    400138: valvle_izquierda
+    400140: arround_2_2
+    400142: final_abajo
+    400144: arround_2_3
+    400146: arround_5
+    400148: arround_6
+    400150: final_abajo_2
+    400152: heart_all
+    400154: Joint_2_10
+    400156: Joint_2_11
+    400158: Joint_2_12
+    400160: Joint_2_13
+    400162: Joint_2_14
+    400164: Joint_2_8
+    400166: Joint_2_9
+    400168: MAIN_2
+    400170: Root_4
+    400172: Skin_3
+    400174: final_abajo_xx
+    2300000: Bicuspid_Valve1_1
+    2300002: valvle_derecha
+    3300000: Bicuspid_Valve1_1
+    3300002: valvle_derecha
+    4300000: Group1_Cube
+    4300002: Bicuspid_Valve1_1
+    4300004: valvle_derecha
+    4300006: valvle_izquierda
+    4300008: heart_all
+    7400000: play
+    7400002: idle
+    9500000: //RootNode
+    11100000: //RootNode
+    13700000: Group1_Cube
+    13700002: valvle_izquierda
+    13700004: heart_all
+    13700006: valvle_derecha
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: play
+      takeName: C4D Animation Take
+      firstFrame: 0
+      lastFrame: 40
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Bicuspid_Valve1_1
+        weight: 1
+      - path: Boole_2
+        weight: 1
+      - path: Boole_2/Group1_Cube
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/center
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/center/Joint_3
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_1
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_1/Joint_3_9
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_1/Joint_3_9/Root
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_1/Joint_3_9/Root/peyejo_1
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_1/Joint_3_9/Root/peyejo_1/Joint_5
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_2/Joint_3_10
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_2/Joint_3_10/Root_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_2/Joint_3_10/Root_2/peyejo_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_2/Joint_3_10/Root_2/peyejo_2/Joint_5_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_1_6
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_1_6/Joint_3_11
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_2___
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_2___/Joint_3_13
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_2___0
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_2___0/Joint_3_12
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion/Joint_3_3
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_1b
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_1b/Joint_3_4
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_2/Joint_3_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_2_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_2_2/Joint_3_5
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_3
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_3/Joint_3_6
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_4
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_4/Joint_3_7
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_5
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_5/Joint_3_8
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE/Joint_1_3
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE_2/Joint_1_4
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE_3
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE_3/Joint_1_5
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/valve_1
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/valve_1/Joint_1
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/valve_1_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/valve_1_2/Joint_1_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Skin
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: idle
+      takeName: C4D Animation Take
+      firstFrame: 41
+      lastFrame: 43
+      wrapMode: 1
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Bicuspid_Valve1_1
+        weight: 1
+      - path: Boole_2
+        weight: 1
+      - path: Boole_2/Group1_Cube
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/center
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/center/Joint_3
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_1
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_1/Joint_3_9
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_1/Joint_3_9/Root
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_1/Joint_3_9/Root/peyejo_1
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_1/Joint_3_9/Root/peyejo_1/Joint_5
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_2/Joint_3_10
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_2/Joint_3_10/Root_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_2/Joint_3_10/Root_2/peyejo_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/down_2/Joint_3_10/Root_2/peyejo_2/Joint_5_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_1_6
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_1_6/Joint_3_11
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_2___
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_2___/Joint_3_13
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_2___0
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/Joint_2___0/Joint_3_12
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion/Joint_3_3
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_1b
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_1b/Joint_3_4
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_2/Joint_3_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_2_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_2_2/Joint_3_5
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_3
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_3/Joint_3_6
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_4
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_4/Joint_3_7
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_5
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/no_motion_5/Joint_3_8
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE/Joint_1_3
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE_2/Joint_1_4
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE_3
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/NO_MOVE_3/Joint_1_5
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/valve_1
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/valve_1/Joint_1
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/valve_1_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Root_oo/valve_1_2/Joint_1_2
+        weight: 1
+      - path: Boole_2/Group1_Cube/Skin
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 0.7
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 0
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 1
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
