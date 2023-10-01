@@ -43,6 +43,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 8d3dbe01d9ac94c4399b23cb097ecd55, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _ClearCoatMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -95,7 +99,9 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _Blend: 0
+    - _BlendOp: 0
     - _BumpScale: 1
+    - _ClearCoat: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -106,6 +112,7 @@ Material:
     - _EnvironmentReflections: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.9
+    - _GlossinessSource: 0
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
@@ -113,8 +120,11 @@ Material:
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _Shininess: 0
     - _Smoothness: 0.9
+    - _SmoothnessSource: 0
     - _SmoothnessTextureChannel: 0
+    - _SpecSource: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0

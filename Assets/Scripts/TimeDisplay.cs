@@ -21,7 +21,7 @@ public class TimeDisplay : MonoBehaviour
 private void UpdateDisplay()
 {
     // Get current time in EST
-    DateTime estTime = DateTime.UtcNow.AddHours(-5); // UTC to EST conversion (this doesn't account for daylight saving time)
+    DateTime estTime = DateTime.UtcNow.AddHours(-4); // UTC to EST conversion (this doesn't account for daylight saving time)
     currentTimeText.text = estTime.ToString("hh:mm:ss tt"); // 12-hour format with AM/PM
 
     // Calculate elapsed time
