@@ -1,0 +1,8 @@
+Model Information:
+* title:	Neutral Female Head Scan
+* source:	https://sketchfab.com/3d-models/neutral-female-head-scan-c20ae69e1eb640b19ade6624fed10092
+* author:	captureddimensions (https://sketchfab.com/captureddimensions)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
