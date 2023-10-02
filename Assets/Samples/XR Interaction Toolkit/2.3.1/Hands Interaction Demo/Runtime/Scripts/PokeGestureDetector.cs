@@ -14,6 +14,9 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.Hands
     {
         [SerializeField]
         [Tooltip("Which hand to check for the poke gesture.")]
+        public XRRayInteractor leftHandRayInteractor;
+        public XRRayInteractor rightHandRayInteractor;
+
 #if XR_HANDS
         Handedness m_Handedness;
 #else
@@ -190,11 +193,18 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.Hands
             m_PokeGestureStarted.Invoke();
         }
 
-        void EndPokeGesture()
-        {
-            m_IsPoking = false;
-            m_PokeGestureEnded.Invoke();
-        }
+void EndPokeGesture()
+{
+    m_IsPoking = false;
+    m_PokeGestureEnded.Invoke();
+
+    // Re-enable the ray interactors after the poke gesture ends
+    if (leftHandRayInteractor)
+        leftHandRayInteractor.enabled = true;
+    if (rightHandRayInteractor)
+        rightHandRayInteractor.enabled = true;
+}
+
 #endif
     }
 }
