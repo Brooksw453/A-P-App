@@ -16,6 +16,8 @@ public class Question
     public int CorrectAnswer => correctAnswer;
     public bool HasBeenAsked => hasBeenAsked;
     public bool UserGotItRight => userGotItRight;
+ 
+
 }
 
 public class QuizManager : MonoBehaviour
@@ -34,6 +36,7 @@ public class QuizManager : MonoBehaviour
     private AudioSource audioSource; 
     public GameObject correctAnswerParticleEffect;
     public static QuizManager ActiveQuiz { get; private set; }
+    public GameObject reloadQuizPanel; // Assign the "Reload Quiz" panel in the inspector
 
 
     private void Start()
@@ -163,6 +166,7 @@ public class QuizManager : MonoBehaviour
     // 1. Reset score
     score = 0;
     UpdateScoreDisplay();
+     reloadQuizPanel.SetActive(false);
 
     // 2. Turn off all currently active questions
     foreach (var q in selectedQuestions)
@@ -202,6 +206,8 @@ public class QuizManager : MonoBehaviour
         ActiveQuiz = null;    
     Debug.Log("Quiz Finished!");
         // You can expand this later to handle the end of the quiz
+            // Activate the "Reload Quiz" panel
+    reloadQuizPanel.SetActive(true);
     }
 
     private void Shuffle<T>(List<T> list)
