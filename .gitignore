@@ -76,3 +76,7 @@ crashlytics-build.properties
 anatomy-and-physiology-2e_-_WEB.pdf
 *.pdf
 Skull Labels.docx
+
+# MCP-for-Unity scratch screenshots
+/Assets/Screenshots/
+/Assets/Screenshots.meta
