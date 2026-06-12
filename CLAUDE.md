@@ -123,10 +123,19 @@ don't fan out parallel agents onto it). Claude can't see headset output — the 
 - ✅ Course-side `VRLabCallout` written (web repo, not deployed).
 - ✅ `APLab` framework C# in project, compiles clean.
 - ✅ Unity MCP bridge working.
-- ✅ **Pilot scene `Module_Skeletal.unity`** built: exploding-skull model + directional light +
-  **Meta MR passthrough rig** (`OVRCameraRig` + `OVRManager` insight passthrough + `OVRPassthroughLayer`
-  underlay + transparent center-eye clear).
-- **Pilot = Skeletal System** (skull bones), maps to course **§7.2**.
+- ✅ **Pilot scene `Module_Skeletal.unity`** built: clean **`Skull_full`** model (Anatomical_Human_Skeleton,
+  ~19 cm, rotated to face the user), directional light, and the **Meta MR passthrough rig** (`OVRCameraRig`
+  + `OVRManager` insight passthrough + `OVRPassthroughLayer` underlay + transparent center-eye clear).
+  *(Swapped off the exploding-skull prefab — its pivot is offset from the mesh; revisit that one for the
+  per-bone explode/place practical, ideally positioning it live in the Editor.)*
+- ✅ Imported anatomy **materials converted to URP** (Render Pipeline Converter run; the earlier "green" was
+  just a selection gizmo, not the model).
+- ✅ **`Main` branch synced** (2026-06-12): all of today's work fast-forwarded onto `origin/Main` via a
+  `-X ours` merge of `origin/Main` into our branch (kept Main's 2024 AP-logo/Menu-Table content, dropped the
+  unused 42 MB mp3). PR #35 resolved. Working branch is still `meta-xr-migration`; `Main` == its tip.
+- **Pilot = Skeletal System**, maps to course **§7.2**.
+- ⚠️ **Bridge tip:** a domain reload (after a big reimport/merge/recompile) drops the Unity MCP session —
+  the HTTP server stays up; just re-click **Start Session** in the MCP For Unity window to reconnect.
 
 ## 8. Known issues / cleanup
 
