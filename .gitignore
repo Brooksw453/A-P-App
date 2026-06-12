@@ -70,3 +70,9 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Large reference docs / textbooks — keep out of the repo (they live in the
+# parent folder today; ignore defensively in case one is moved inside).
+anatomy-and-physiology-2e_-_WEB.pdf
+*.pdf
+Skull Labels.docx

@@ -1,2 +1,76 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Normalize line endings; check out/in as LF to stop CRLF<->LF churn on Windows.
+* text=auto eol=lf
+
+# Source / text
+*.cs        text diff=csharp
+*.shader    text
+*.cginc     text
+*.hlsl      text
+*.compute   text
+*.uss       text
+*.uxml      text
+*.json      text
+*.md        text
+*.txt       text
+*.xml       text
+*.yml       text
+
+# Unity serialized YAML — text, LF, and Unity's smart merge driver
+# (merge=unityyamlmerge is a no-op unless the driver is configured in git config)
+*.meta              text eol=lf merge=unityyamlmerge
+*.unity             text eol=lf merge=unityyamlmerge
+*.asset             text eol=lf merge=unityyamlmerge
+*.prefab            text eol=lf merge=unityyamlmerge
+*.mat               text eol=lf merge=unityyamlmerge
+*.anim              text eol=lf merge=unityyamlmerge
+*.controller        text eol=lf merge=unityyamlmerge
+*.overrideController text eol=lf merge=unityyamlmerge
+*.physicMaterial    text eol=lf merge=unityyamlmerge
+*.playable          text eol=lf merge=unityyamlmerge
+*.mask              text eol=lf merge=unityyamlmerge
+*.brush             text eol=lf merge=unityyamlmerge
+*.flare             text eol=lf merge=unityyamlmerge
+*.fontsettings      text eol=lf merge=unityyamlmerge
+*.guiskin           text eol=lf merge=unityyamlmerge
+*.renderTexture     text eol=lf merge=unityyamlmerge
+*.spriteatlas       text eol=lf merge=unityyamlmerge
+*.terrainlayer      text eol=lf merge=unityyamlmerge
+*.mixer             text eol=lf merge=unityyamlmerge
+*.shadergraph       text eol=lf
+*.shadersubgraph    text eol=lf
+
+# Binary assets — never apply text/eol conversion
+*.fbx   binary
+*.FBX   binary
+*.obj   binary
+*.blend binary
+*.glb   binary
+*.gltf  binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.psd   binary
+*.tif   binary
+*.tiff  binary
+*.tga   binary
+*.exr   binary
+*.hdr   binary
+*.wav   binary
+*.mp3   binary
+*.ogg   binary
+*.aif   binary
+*.aiff  binary
+*.mp4   binary
+*.mov   binary
+*.dll   binary
+*.so    binary
+*.dylib binary
+*.a     binary
+*.aar   binary
+*.bytes binary
+*.unitypackage binary
+
+# Large binaries to consider moving to Git LFS later (deliberate migration):
+#   butterfly.FBX (~95MB) and other large fbx/psd/mp4 assets.
+#   Run: git lfs install && git lfs migrate import --include="*.fbx,*.psd,*.mp4"
