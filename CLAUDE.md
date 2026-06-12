@@ -6,6 +6,62 @@ Keep it updated as the project evolves.
 
 ---
 
+## 0. ⏭️ RESUME HERE — first move in a fresh chat (saved end of 2026-06-12, marathon #2)
+
+**Where we are:** **Slice 1** of the bone-ID Practice (§9 step 2) is **built and verified in the Editor** —
+autoSelfTest ran the full `Learn→Practice→Assess→Results` flow on-device-of-the-editor (practical = 77%). The
+whole framework now runs **data-driven off `skeletal-system.json`**. The one remaining wall is **getting the
+Android build to actually run on the Quest**. It now boots all the way through IL2CPP, Vulkan, OpenXR, and the
+Meta MR Utility Kit, then **crashes while loading the scene**:
+> `The file '.../assets/bin/Data/level0' is corrupted! [Position out of bounds!]` → `SIGTRAP` in `Loading.Preload`
+
+`level0` = the `Module_Skeletal` scene baked into the APK. This is **a corrupt build artifact, NOT our code**
+(the scene loads perfectly in the Editor; disk has 1.3 TB free). It survived a player-data cache clear
+(`Library/PlayerDataCache` + `BuildPlayerData`), so the next step is a **full clean**. *(No MCP bridge needed
+for this — it's all file ops + adb.)*
+
+**THE NEXT MOVE — full clean rebuild, then sideload:**
+1. **Close Unity. Delete the entire `A-P-App/Library/` folder** (forces a full reimport that regenerates
+   `level0` from source). *Cheaper thing to try first if you like: reopen → open `Module_Skeletal` → Ctrl+S to
+   re-save → rebuild. But the `Library` wipe is the reliable cure for "level0 corrupted."*
+2. **Reopen Unity** — long reimport; let it settle (the Meta XR audio updater churns — normal).
+3. **Re-enter keystore passwords** (they do **NOT** persist across Unity restarts — this bit us): Project
+   Settings → Player → **Publishing Settings** → Keystore password + Key alias **`ap key`** password.
+   Keystore: `C:\Users\brook\GitHub\Local Keystores\A-P  Lab Keystore 26.keystore` (note the double space).
+4. **Build the APK** (just *Build*; no need to deploy).
+5. **Tell Claude "built"** → Claude sideloads + launches + reads logcat (all via adb, zero headset fiddling):
+   - adb: `C:\Program Files\Unity\Hub\Editor\6000.3.8f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\platform-tools\adb.exe`
+   - APK: `A-P-App/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/outputs/apk/release/launcher-release.apk`
+   - `adb install -r -d "<apk>"` → `adb shell monkey -p com.ESD.AP.lab -c android.intent.category.LAUNCHER 1`
+   - capture: `adb logcat -c`; launch; `adb logcat -d > log.txt`; grep `[APLab]` / `level0` / `Stripping`.
+6. **Success = logcat shows `[APLab] Starting module…` and NO "level0 corrupted".** Then the real poke test:
+   set `Module Host` → **`autoSelfTest` = OFF** (so you poke manually) and use the **right Touch controller**
+   (the Poke Tip rides `RightHandAnchor`; hand-tracking poke isn't wired yet). Report how poking *feels*
+   (target size ~3.6 cm, tip offset 7 cm, reachability) and the skull's placement/legibility in passthrough.
+7. **If `level0` is STILL corrupt after a full `Library` wipe** → it's the scene *content*, not a cache.
+   Isolate: temporarily make a trivial empty scene the only enabled build scene, build, sideload. Empty scene
+   runs → bisect/regenerate `Module_Skeletal` (suspect generated label objects / runtime-created materials);
+   empty scene also corrupt → project-wide build-pipeline issue.
+
+**Android facts you'll need (all hard-won 2026-06-12):**
+- **Package name is `com.ESD.AP.lab`** (deliberate). The published store app is `com.ESD.AP` signed with the
+  *original* key; our dev keystore differs, so a dev build can't replace the store app (signature mismatch) and
+  the store re-syncs it. A separate package lets the dev build coexist. **Three same-named "Anatomy & Physiology
+  Lab" apps are on the headset now:** `com.ESD.AP` (store), `com.Education_Simulation_Design.APLab` (older),
+  **`com.ESD.AP.lab` (ours — the one to launch/test).**
+- Build = **Android / IL2CPP / ARM64 / Vulkan**, Linear color space, GameActivity entry. **`stripEngineCode: 0`**
+  and Android **`managedStrippingLevel: 0`** — we turned stripping OFF (it caused an *earlier* preload crash);
+  **keep it off.**
+- "Active Input Handling = **Both**" warns it's unsupported on Android — **not** a crash cause (our poke uses
+  physics triggers + OVR tracking, not Unity input). Leave it, or set to one handler later.
+- Test headset is a **Quest Pro (`seacliff`)** — fine, same MR/passthrough stack as Quest 3.
+- adb on this device is noisy/large and sometimes stalls: clear (`-c`) before launch + use bounded dumps
+  (`-d -t N`, or redirect to a file). A **Quest reboot drops adb** — re-accept the USB-debugging prompt in-headset.
+- Slice-1 wiring already in the saved scene: **Module Host** (`ModuleHost`, `contentJson` = skeletal-system.json,
+  `autoStartOnPlay` on) + **Poke Tip** under `RightHandAnchor`; 14 markers each carry a `BoneTarget`.
+
+---
+
 ## 1. What this is
 
 A **3D Anatomy & Physiology lab companion app** for **Meta Quest 3**, built in **Unity 6000.3.8f1**,
@@ -108,6 +164,14 @@ package `mcpforunityserver`). **Architecture: ONE HTTP server on `127.0.0.1:8080
 - `claude mcp list` does a *fresh* check (will say ✓ Connected) even when the *running session* is on a stale
   stdio server. Trust `mcpforunity://instances` (transport + instance_count), not just `claude mcp list`.
 - After you restart the **Unity Editor**, its instance token changes — just re-click **Start Session**.
+- **The bridge does NOT auto-reconnect on this project — a human must click `Start Session` after every drop.**
+  Hard-won this session (2026-06-12): every script recompile (domain reload) AND every Play-mode enter drops
+  the session to `instance_count: 0`, and it stays down until someone clicks **Window → MCP For Unity →
+  Start Session**. Focusing the window / `AppActivate(<UnityPID>)` did **not** bring it back on its own.
+  Implication: (1) batch script edits to minimize recompiles; (2) Claude can't press Play and then read the
+  console over the bridge — instead read `Debug.Log` output straight from `Editor.log`
+  (`C:\Users\brook\AppData\Local\Unity\Editor\Editor.log`), which needs no bridge. The Meta XR audio/spatializer
+  updater churning after the Android platform switch made the drops more frequent this session.
 - The MCP window has **Start Server** (launches the http server) vs **Start Session** (connects Unity to it) —
   both are needed; "No Session" with a red dot = server up but session not started.
 
@@ -131,13 +195,22 @@ don't fan out parallel agents onto it). Claude can't see headset output — the 
 - ✅ Imported anatomy **materials converted to URP** (Render Pipeline Converter run; the earlier "green" was
   just a selection gizmo, not the model).
 - ✅ **Labeled skull** via a **data-driven generator** — `Assets/Editor/SkeletalLabelGenerator.cs`, menu
-  **A&P Lab/Generate Skeletal Labels** — stamps cranial/facial labels (TMP text built in code so it renders,
-  + leader lines + markers) onto the skull. Currently 7 visible bones; re-runnable, extendable to all 14 from
-  `skeletal-system.json`. *(Lesson: ad-hoc TMP/`TextMesh` created via the bridge won't render in Unity 6 —
+  **A&P Lab/Generate Skeletal Labels** — stamps labels (TMP text built in code so it renders, + leader lines
+  + markers) onto the skull. **Now all 14 bones** (2025-06-12): term + pronunciation pulled from
+  `skeletal-system.json` (single source of truth), laid out in two columns with leader lines; TMP pivot on the
+  inner edge so text grows outward (no mesh overlap). Each label carries a **`LabelInfo`** (term/pronunciation/
+  definition/landmark, for the upcoming tap-the-bone Practice) and a **`LabelBillboard`** (faces the user at
+  runtime; editor preview off by default) — both in `Assets/APLab/Runtime/View/`. Re-runnable; rebuilds the
+  `Skeletal Labels` root. *(Lesson: ad-hoc TMP/`TextMesh` created via the bridge won't render in Unity 6 —
   build the text from a compiled script and call `ForceMeshUpdate`.)*
-- ⚠️ **Build platform is still `StandaloneWindows64`.** A Quest build needs switching to **Android** (a long
-  full asset reimport — do it as a focused pre-build step), then set `Module_Skeletal` as the startup build
-  scene, build the APK (IL2CPP/ARM64), deploy via Meta Quest Developer Hub. *(Brooks handles the Android side.)*
+  ⚠️ **7 deep/posterior landmark points are approximate** (sphenoid, occipital, ethmoid, lacrimal, inferior
+  nasal concha, vomer, palatine) — the generator logs them and sets `LabelInfo.approximate`; nudge the marker
+  points live in the Editor (the 7 facial/cranial-surface bones are tuned). Some are really better shown on the
+  exploded/cutaway skull later.
+- ✅ **Build platform switched to Android** (IL2CPP/ARM64/Vulkan); `Module_Skeletal` is the only enabled build
+  scene. ✅ **Slice-1 Practice built & Editor-verified** (see §9 step 2). ⛔ **Quest build does not run yet** —
+  blocked on a corrupt `level0` scene artifact in the APK (`SIGTRAP` in `Loading.Preload`). **See §0 for exactly
+  where to resume.** *(Brooks drives the Android side; Claude can sideload + read logcat via adb.)*
 - ✅ **`Main` branch synced** (2026-06-12): all of today's work fast-forwarded onto `origin/Main` via a
   `-X ours` merge of `origin/Main` into our branch (kept Main's 2024 AP-logo/Menu-Table content, dropped the
   unused 42 MB mp3). PR #35 resolved. Working branch is still `meta-xr-migration`; `Main` == its tip.
@@ -147,29 +220,71 @@ don't fan out parallel agents onto it). Claude can't see headset output — the 
 
 ## 8. Known issues / cleanup
 
-- **Duplicate `OVRPlugin.dll`** (the only recurring console error — benign warning): the legacy `Assets/Oculus/`
-  was *partially* deleted; `OVRPlugin.dll` + the spatializer DLL are locked while Unity runs, and
-  `OculusProjectConfig.asset` was kept (needed by `OVRManager`). To finish: **close Unity → delete
-  `Assets/Oculus/VR` and `Assets/Oculus/Spatializer` → reopen** (keep `OculusProjectConfig.asset`).
+- ✅ **Duplicate `OVRPlugin.dll` — RESOLVED (2026-06-12).** This was NOT just a benign warning: on **Android**
+  it became a **fatal build error** (`Error building Player: 7 errors`, failing in Preprocess Player in ~1s on
+  the plugin-name collision). Fixed by deleting the leftover duplicate plugin files with Unity closed (DLLs are
+  locked while it runs): `Assets/Oculus/VR/Plugins/1.82.0/Win64OpenXR/OVRPlugin.dll` and
+  `Assets/Oculus/Spatializer/Plugins/x86_64/AudioPluginOculusSpatializer.dll` (+ their `.meta`).
+  `OculusProjectConfig.asset` kept (OVRManager needs it). Empty `Assets/Oculus/VR` + `Spatializer` folders
+  remain (harmless; delete in Explorer for tidiness).
+- ⚠️ **Both Oculus XR Plugin (`com.unity.xr.oculus`) and OpenXR Plugin (`com.unity.xr.openxr`) are installed** —
+  Unity logs "not recommended… OpenXR is the recommended plugin." It's an *advisory*, not one of the hard build
+  errors, so left as-is for now. If it ever blocks a build, remove `com.unity.xr.oculus` from
+  `Packages/manifest.json` (the project is on the Meta XR / OpenXR backend).
+- ⛔ **Android build doesn't run yet — corrupt `level0` (the `Module_Skeletal` scene in the APK).** Full saga +
+  fix in **§0**. Boots through all subsystems, then `SIGTRAP` in `Loading.Preload` on `level0 corrupted /
+  Position out of bounds`. Not our code (loads in Editor). Fix = full `Library` wipe + clean rebuild.
+- ⚠️ **Keystore passwords don't persist across Unity restarts** — re-enter them (Player → Publishing Settings)
+  before every build after reopening the project, or the APK signing step fails (manifests as a misleading
+  Gradle `PackageAndroidArtifact$IncrementalSplitterRunnable` error).
+- ⚠️ **`com.ESD.AP.lab` dev package coexists with the published `com.ESD.AP` store app** (signature mismatch
+  prevents replacing it). Three same-named apps are on the test headset — see §0. Sideload **ours** via
+  `adb install -r -d` of `launcher-release.apk` and launch `com.ESD.AP.lab`.
 - ✅ Materials converted to URP. ✅ Skull is the clean `Skull_full` (the exploding-skull's offset pivot is
   parked for the per-bone explode/place lab later).
-- Repo has historical line-ending churn; a proper `.gitattributes` pass is still pending.
+- Repo has historical line-ending churn; a proper `.gitattributes` pass is still pending. `.utmp/` (Android
+  build scratch) is now in `.gitignore`.
 
 ## 9. Next steps (in order)
 
-1. **Extend the labels** — all 14 bones + pull definitions from `skeletal-system.json`; add a small billboard
-   so labels face the user; nudge positions. (Generator: `Assets/Editor/SkeletalLabelGenerator.cs`, re-run via
-   menu *A&P Lab/Generate Skeletal Labels*.)
-2. **Bone-ID / "tap the bone" Practice** — Meta hand grab/poke on the skull, scored (the hands-on phase).
+1. ✅ **Extend the labels** (2025-06-12) — all 14 bones, content pulled from `skeletal-system.json`,
+   `LabelBillboard` faces the user, two-column layout. *Remaining:* nudge the 7 approximate deep/posterior
+   marker points in the Editor (generator logs which). (Generator: `Assets/Editor/SkeletalLabelGenerator.cs`,
+   re-run via menu *A&P Lab/Generate Skeletal Labels*.)
+2. **Bone-ID / "tap the bone" Practice** — ⏳ *in progress.* ✅ **Slice 1 done & verified (2026-06-12):** the
+   whole framework now runs data-driven off `skeletal-system.json`. New runtime: `ModuleContentLoader`
+   (JSON→`ModuleDefinition` in memory, no SO assets — `Runtime/Content/`), `BoneTarget` (pokeable marker w/
+   arm + correct/wrong flash), `PokeInput` (`PokeTip` trigger-poke for hand/controller + `MouseRaySelector`
+   fallback), and `ModuleHost` (orchestrator that drives `ModuleRunner` Learn→Practice→Assess→Results and
+   scores each IdentifyPart step). The generator now also stamps a trigger-collider `BoneTarget` on every
+   marker. Scene `Module_Skeletal` wired: **Module Host** (autoSelfTest verified practical=77% — 5/5 bones +
+   deferred PlaceInSocket) + **Poke Tip** under `RightHandAnchor`. *Remaining:* Learn-phase UI (slice 2) and
+   the quiz/Assess UI (slice 3); real headset poke-test; `PlaceInSocket` scoring.
 3. **Wire results** — `ModuleRunner` + `SessionTracker` + `SupabaseClient` → post a completed lab to
    **`vr-sync-result`** (writes `vr_lab_attempts`, upserts `section_progress`, logs `activity_log`). Add the
    device-code login UI.
 4. **Hub / Atlas** — a home scene with mode select; then replicate the framework for the rest of Season 1
    (heart, respiratory, digestive, urinary, brain, muscular — see the `vr_modules` seed for section mapping).
-5. **Quest build** (Brooks drives the Android side): switch platform to Android, set `Module_Skeletal` as the
-   startup build scene, build the APK, deploy via Meta Quest Developer Hub, verify passthrough in-headset.
+5. **Quest build** (Brooks drives the Android side): ✅ platform switched to Android, `Module_Skeletal` is the
+   build scene, APK builds + signs + sideloads. ⛔ **Currently blocked:** the APK boots fully (IL2CPP/Vulkan/
+   OpenXR/MR) then crashes on a **corrupt `level0` scene artifact** — fix is a full `Library` wipe + clean
+   rebuild. **See §0 for the step-by-step.**
 
 ## Session log
+
+**2026-06-12 (marathon #2 — slice 1 + Android bringup)** — Built **slice 1 of the bone-ID Practice**: a
+data-driven runtime that loads `skeletal-system.json` into an in-memory `ModuleDefinition`
+(`ModuleContentLoader`), pokeable `BoneTarget` markers, a decoupled `PokeInput` layer (`PokeTip` +
+`MouseRaySelector`), and a `ModuleHost` orchestrator driving `ModuleRunner` through all four phases. Extended
+the label generator to all 14 bones (JSON-sourced text, billboard, two-column layout) and to stamp a
+`BoneTarget` on each marker. Wired `Module Host` + `Poke Tip` into the scene. **Verified the whole flow in the
+Editor** via an autoSelfTest (practical 77%, scoring flows through `ModuleRunner`). Then spent a long time on
+**first-ever Quest/Android bringup**, clearing blocker after blocker: keystore, duplicate-`OVRPlugin` build
+collision (§8), engine-stripping preload crash, a store-vs-dev **signature/package conflict** (→ renamed dev
+build to `com.ESD.AP.lab`), keystore passwords not persisting across restarts, and finally a **corrupt `level0`
+scene artifact** that still blocks the app from running on-device. **Banked here** (committed/pushed) with slice
+1 Editor-verified. **Resume = §0** (full `Library` wipe → rebuild → sideload). Slices 2 (Learn UI) & 3 (quiz +
+Supabase result-sync) still pending.
 
 **2026-06-12 (marathon)** — Took the project from a stalled, *uncommitted* OpenXR→Meta XR migration to: migration
 protected and **`Main` fully synced** (PR #35 resolved, kept Main's 2024 content, dropped a 42 MB unused mp3);
