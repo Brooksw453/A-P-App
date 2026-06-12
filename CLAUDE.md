@@ -130,6 +130,14 @@ don't fan out parallel agents onto it). Claude can't see headset output — the 
   per-bone explode/place practical, ideally positioning it live in the Editor.)*
 - ✅ Imported anatomy **materials converted to URP** (Render Pipeline Converter run; the earlier "green" was
   just a selection gizmo, not the model).
+- ✅ **Labeled skull** via a **data-driven generator** — `Assets/Editor/SkeletalLabelGenerator.cs`, menu
+  **A&P Lab/Generate Skeletal Labels** — stamps cranial/facial labels (TMP text built in code so it renders,
+  + leader lines + markers) onto the skull. Currently 7 visible bones; re-runnable, extendable to all 14 from
+  `skeletal-system.json`. *(Lesson: ad-hoc TMP/`TextMesh` created via the bridge won't render in Unity 6 —
+  build the text from a compiled script and call `ForceMeshUpdate`.)*
+- ⚠️ **Build platform is still `StandaloneWindows64`.** A Quest build needs switching to **Android** (a long
+  full asset reimport — do it as a focused pre-build step), then set `Module_Skeletal` as the startup build
+  scene, build the APK (IL2CPP/ARM64), deploy via Meta Quest Developer Hub. *(Brooks handles the Android side.)*
 - ✅ **`Main` branch synced** (2026-06-12): all of today's work fast-forwarded onto `origin/Main` via a
   `-X ours` merge of `origin/Main` into our branch (kept Main's 2024 AP-logo/Menu-Table content, dropped the
   unused 42 MB mp3). PR #35 resolved. Working branch is still `meta-xr-migration`; `Main` == its tip.
@@ -139,24 +147,38 @@ don't fan out parallel agents onto it). Claude can't see headset output — the 
 
 ## 8. Known issues / cleanup
 
-- **Duplicate `OVRPlugin.dll`** → remove the legacy `Assets/Oculus/` folder (old Oculus Integration,
-  superseded by the Meta XR SDK package). Causes the repeated console errors.
-- **Imported anatomy materials render green** → run Window → Rendering → **Render Pipeline Converter** →
-  *Built-in to URP* → Initialize & Convert (project is URP).
-- **Exploding-skull prefab pivot is offset** from its mesh (scaling moves it out of frame) → wrap it in an
-  anchor GameObject or fix the pivot.
-- Repo has line-ending churn historically; `.gitattributes` cleanup is still pending.
+- **Duplicate `OVRPlugin.dll`** (the only recurring console error — benign warning): the legacy `Assets/Oculus/`
+  was *partially* deleted; `OVRPlugin.dll` + the spatializer DLL are locked while Unity runs, and
+  `OculusProjectConfig.asset` was kept (needed by `OVRManager`). To finish: **close Unity → delete
+  `Assets/Oculus/VR` and `Assets/Oculus/Spatializer` → reopen** (keep `OculusProjectConfig.asset`).
+- ✅ Materials converted to URP. ✅ Skull is the clean `Skull_full` (the exploding-skull's offset pivot is
+  parked for the per-bone explode/place lab later).
+- Repo has historical line-ending churn; a proper `.gitattributes` pass is still pending.
 
-## 9. Next steps
+## 9. Next steps (in order)
 
-1. Fix the 3 cleanup items above (quick, mostly in-Editor).
-2. Attach the **14 bone labels** from `Content/skeletal-system.json` to the skull bones (the exploding-skull
-   prefab has named per-bone meshes + a socket scaffold).
-3. Build the **bone-ID + place-the-bone** practical (refactor existing socket scripts onto Meta grabbables).
-4. Wire `ModuleRunner` / `SessionTracker` / `SupabaseClient` so a completed lab posts to **`vr-sync-result`**.
-5. Build to Quest 3, verify passthrough + interaction in-headset.
-6. Then replicate the module framework for the rest of Season 1 (heart, respiratory, digestive, urinary,
-   brain, muscular, etc. — see `vr_modules` seed for the section mapping).
+1. **Extend the labels** — all 14 bones + pull definitions from `skeletal-system.json`; add a small billboard
+   so labels face the user; nudge positions. (Generator: `Assets/Editor/SkeletalLabelGenerator.cs`, re-run via
+   menu *A&P Lab/Generate Skeletal Labels*.)
+2. **Bone-ID / "tap the bone" Practice** — Meta hand grab/poke on the skull, scored (the hands-on phase).
+3. **Wire results** — `ModuleRunner` + `SessionTracker` + `SupabaseClient` → post a completed lab to
+   **`vr-sync-result`** (writes `vr_lab_attempts`, upserts `section_progress`, logs `activity_log`). Add the
+   device-code login UI.
+4. **Hub / Atlas** — a home scene with mode select; then replicate the framework for the rest of Season 1
+   (heart, respiratory, digestive, urinary, brain, muscular — see the `vr_modules` seed for section mapping).
+5. **Quest build** (Brooks drives the Android side): switch platform to Android, set `Module_Skeletal` as the
+   startup build scene, build the APK, deploy via Meta Quest Developer Hub, verify passthrough in-headset.
+
+## Session log
+
+**2026-06-12 (marathon)** — Took the project from a stalled, *uncommitted* OpenXR→Meta XR migration to: migration
+protected and **`Main` fully synced** (PR #35 resolved, kept Main's 2024 content, dropped a 42 MB unused mp3);
+a live **Supabase VR backend** (4 tables + 4 edge functions + seeded module catalog); course-side `VRLabCallout`;
+authored Skeletal content; the **Unity MCP bridge made to work *and* documented** (the big time-sink — see §6);
+a **Meta MR passthrough scene** with a clean skull; **URP material conversion**; and a **data-driven label
+generator → labeled skull**. All committed/pushed to `Main`. Stopped before bone-ID interaction, result-sync,
+and the Quest build (see §9). To resume: connect the repo, open `A-P-App` in Unity, follow §6 to reconnect the
+bridge, then say "go."
 
 ## 10. The full design/plan
 
