@@ -14,8 +14,8 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.Hands
     {
         [SerializeField]
         [Tooltip("Which hand to check for the poke gesture.")]
-        public XRRayInteractor leftHandRayInteractor;
-        public XRRayInteractor rightHandRayInteractor;
+        public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor leftHandRayInteractor;
+        public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor rightHandRayInteractor;
 
 #if XR_HANDS
         Handedness m_Handedness;

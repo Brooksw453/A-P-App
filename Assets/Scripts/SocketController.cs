@@ -1,88 +1,69 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
+/// <summary>
+/// Detects when an object enters a socket zone and controls visibility of a related object.
+/// Framework-agnostic — uses physics triggers, works with Meta Interaction SDK or any system.
+/// </summary>
 public class SocketController : MonoBehaviour
 {
-    public GameObject objectToDetect; // The particular game object to detect
-    public GameObject thirdObject; // The third game object to turn on/off
+    [Header("References")]
+    public GameObject objectToDetect;
+    public GameObject thirdObject;
+
+    [Header("Settings")]
+    [SerializeField] private float reactivateDelay = 0.1f;
 
     private bool isObjectInSocket = false;
     private bool isObjectGrabbed = false;
-    private bool isObjectSelected = false;
-    private bool isTurningOffThirdObject = false;
+    private Coroutine delayedReactivateCoroutine;
 
     private void Update()
     {
-        // If the object is in the socket, grabbed, or selected, turn off the third object
-        if (isObjectInSocket || isObjectGrabbed || isObjectSelected)
+        bool shouldHide = isObjectInSocket || isObjectGrabbed;
+
+        if (shouldHide)
         {
-            thirdObject.SetActive(false);
-            isTurningOffThirdObject = false;
-        }
-        // If the object is not in the socket, grabbed, or selected, turn on the third object
-        else
-        {
-            if (!isTurningOffThirdObject)
+            if (delayedReactivateCoroutine != null)
             {
-                StartCoroutine(TurnOnThirdObjectDelayed());
+                StopCoroutine(delayedReactivateCoroutine);
+                delayedReactivateCoroutine = null;
             }
+            thirdObject.SetActive(false);
         }
-    }
-
-    private System.Collections.IEnumerator TurnOnThirdObjectDelayed()
-    {
-        isTurningOffThirdObject = true;
-        yield return new WaitForSeconds(0.1f); // Adjust the delay time as needed
-        thirdObject.SetActive(true);
-    }
-
-    public void DeactivateThirdObject()
-    {
-        thirdObject.SetActive(false);
-    }
-
-    public void ReactivateThirdObject()
-    {
-        thirdObject.SetActive(true);
-    }
-
-    public void ObjectGrabbed(bool isGrabbed)
-    {
-        isObjectGrabbed = isGrabbed;
-
-        // If the object is grabbed, set it as selected as well
-        if (isGrabbed)
+        else if (!thirdObject.activeSelf && delayedReactivateCoroutine == null)
         {
-            ObjectSelected(true);
-        }
-        // If the object is released or let go, mark it as not selected
-        else
-        {
-            ObjectSelected(false);
+            delayedReactivateCoroutine = StartCoroutine(ReactivateAfterDelay());
         }
     }
 
-    public void ObjectSelected(bool isSelected)
+    private IEnumerator ReactivateAfterDelay()
     {
-        isObjectSelected = isSelected;
+        yield return new WaitForSeconds(reactivateDelay);
+        thirdObject.SetActive(true);
+        delayedReactivateCoroutine = null;
     }
+
+    /// <summary>
+    /// Call from Meta Interaction SDK's Grabbable WhenPointerEventRaised or UnityEvents.
+    /// </summary>
+    public void SetGrabbed(bool grabbed)
+    {
+        isObjectGrabbed = grabbed;
+    }
+
+    public void DeactivateThirdObject() => thirdObject.SetActive(false);
+    public void ReactivateThirdObject() => thirdObject.SetActive(true);
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject == objectToDetect)
-        {
             isObjectInSocket = true;
-        }
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject == objectToDetect)
-        {
             isObjectInSocket = false;
-        }
     }
 }
-
-

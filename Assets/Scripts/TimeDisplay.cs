@@ -20,9 +20,9 @@ public class TimeDisplay : MonoBehaviour
 
 private void UpdateDisplay()
 {
-    // Get current time in EST
-    DateTime estTime = DateTime.UtcNow.AddHours(-4); // UTC to EST conversion (this doesn't account for daylight saving time)
-    currentTimeText.text = estTime.ToString("hh:mm:ss tt"); // 12-hour format with AM/PM
+    // Get current local time (handles daylight saving automatically)
+    DateTime localTime = DateTime.Now;
+    currentTimeText.text = localTime.ToString("hh:mm:ss tt"); // 12-hour format with AM/PM
 
     // Calculate elapsed time
     TimeSpan elapsedTime = DateTime.UtcNow - startTime;

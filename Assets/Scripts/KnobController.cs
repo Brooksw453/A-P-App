@@ -1,88 +1,78 @@
 using System;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.XR.Interaction.Toolkit;
 
+/// <summary>
+/// Controls a VR knob that rotates based on hand/controller input.
+/// Works with any interaction system (Meta Interaction SDK, XRI, etc.)
+/// Set up grab events via the Inspector using UnityEvents.
+/// </summary>
 public class KnobController : MonoBehaviour
 {
     [Serializable]
     public class FloatEvent : UnityEvent<float> { }
 
+    [Header("Knob Settings")]
+    public float rotationScale = 12f;
+
+    [Header("Events")]
     public FloatEvent onValueChangedEvent = new FloatEvent();
 
-    private XRGrabInteractable grabInteractable;
-    private XRBaseInteractor handInteractor;
+    private Transform currentInteractor;
     private bool isGrabbed = false;
 
     private float initialHandRotation;
     private float initialKnobRotation;
-
     private Vector3 initialLocalPosition;
-private Transform panelTransform;
+    private Transform panelTransform;
 
-    public float rotationScale = 12f;  // Adjust this value to get the desired rotation amplification.
-
-private void Start()
-{
-    grabInteractable = GetComponent<XRGrabInteractable>();
-    grabInteractable.onSelectEntered.AddListener(OnGrab);
-    grabInteractable.onSelectExited.AddListener(OnRelease);
-
-    // Ensure the knob's position is never tracked, only its rotation.
-    grabInteractable.trackPosition = false;
-    grabInteractable.trackRotation = true;
-
-    // Store the knob's initial local position relative to the panel.
-    initialLocalPosition = transform.localPosition;
-
-    // Assuming the panel is the parent of the knob in the hierarchy.
-    panelTransform = transform.parent;
-}
-
-    private void OnDestroy()
+    private void Start()
     {
-        grabInteractable.onSelectEntered.RemoveListener(OnGrab);
-        grabInteractable.onSelectExited.RemoveListener(OnRelease);
+        initialLocalPosition = transform.localPosition;
+        panelTransform = transform.parent;
     }
 
-    private void OnGrab(XRBaseInteractor interactor)
+    /// <summary>
+    /// Call this from your interaction system's Select/Grab event.
+    /// Pass the hand or controller Transform that is grabbing.
+    /// </summary>
+    public void OnGrab(Transform interactorTransform)
     {
         isGrabbed = true;
-        handInteractor = interactor;
-
-        // Record the initial rotation of the hand and the knob when first grabbed.
-        initialHandRotation = handInteractor.transform.localEulerAngles.y;
+        currentInteractor = interactorTransform;
+        initialHandRotation = currentInteractor.localEulerAngles.y;
         initialKnobRotation = transform.localEulerAngles.y;
     }
 
-    private void OnRelease(XRBaseInteractor interactor)
+    /// <summary>
+    /// Call this from your interaction system's Deselect/Release event.
+    /// </summary>
+    public void OnRelease()
     {
         isGrabbed = false;
-        handInteractor = null;
+        currentInteractor = null;
     }
 
-private void Update()
-{
-    // If the knob is grabbed, ensure its position remains fixed relative to the panel.
-    if (isGrabbed)
+    private void Update()
     {
-        transform.position = panelTransform.TransformPoint(initialLocalPosition);
-    }
-    
-if (isGrabbed && handInteractor)
-    {
-        float currentHandRotation = handInteractor.transform.localEulerAngles.y;
+        if (!isGrabbed || currentInteractor == null) return;
+
+        // Lock position to panel
+        if (panelTransform != null)
+            transform.position = panelTransform.TransformPoint(initialLocalPosition);
+
+        float currentHandRotation = currentInteractor.localEulerAngles.y;
         float rotationDifference = -(initialHandRotation - currentHandRotation) * rotationScale;
 
-        // Rotate around local Y-axis.
-        transform.Rotate(0, rotationDifference, 0, Space.Self); 
+        transform.Rotate(0, rotationDifference, 0, Space.Self);
 
-        // Map the knob's rotation to the [0, 1] range for volume.
-        float currentRotation = (transform.localEulerAngles.y > 180) ? transform.localEulerAngles.y - 360 : transform.localEulerAngles.y;
+        // Map rotation to [0, 1] range
+        float currentRotation = (transform.localEulerAngles.y > 180)
+            ? transform.localEulerAngles.y - 360
+            : transform.localEulerAngles.y;
         float normalizedValue = Mathf.InverseLerp(0, 180, currentRotation);
         onValueChangedEvent.Invoke(normalizedValue);
+
+        initialHandRotation = currentHandRotation;
     }
 }
-
-}
-

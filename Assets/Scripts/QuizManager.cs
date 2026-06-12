@@ -14,86 +14,90 @@ public class Question
 
     public GameObject QuestionCanvas => questionCanvas;
     public int CorrectAnswer => correctAnswer;
-    public bool HasBeenAsked => hasBeenAsked;
-    public bool UserGotItRight => userGotItRight;
- 
-
+    public bool HasBeenAsked { get => hasBeenAsked; set => hasBeenAsked = value; }
+    public bool UserGotItRight { get => userGotItRight; set => userGotItRight = value; }
 }
 
 public class QuizManager : MonoBehaviour
 {
+    [Header("Quiz Configuration")]
     [SerializeField] private List<Question> questions = new List<Question>();
-    private List<Question> selectedQuestions = new List<Question>();
+    [SerializeField] private QuizData quizData;
+    [SerializeField] private int questionsPerRound = 5;
 
+    [Header("UI References")]
     [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI bestScoreText;
+    [SerializeField] private TextMeshProUGUI questionCountText;
+    public GameObject correctScreen;
+    public GameObject incorrectScreen;
+    public GameObject reloadQuizPanel;
+
+    [Header("Audio")]
+    public AudioClip correctSound;
+    public AudioClip incorrectSound;
+    private AudioSource audioSource;
+
+    [Header("Effects")]
+    public GameObject correctAnswerParticleEffect;
+
+    public static QuizManager ActiveQuiz { get; private set; }
+
+    private List<Question> selectedQuestions = new List<Question>();
     private bool quizFinished = false;
     private int score = 0;
     private int currentQuestionIndex = 0;
-    public GameObject correctScreen;
-    public GameObject incorrectScreen;
-    public AudioClip correctSound;
-    public AudioClip incorrectSound;
-    private AudioSource audioSource; 
-    public GameObject correctAnswerParticleEffect;
-    public static QuizManager ActiveQuiz { get; private set; }
-    public GameObject reloadQuizPanel; // Assign the "Reload Quiz" panel in the inspector
+    private int pointsPerCorrect = 20;
 
+    private void Awake()
+    {
+        ActiveQuiz = this;
+    }
 
     private void Start()
     {
         if (ActiveQuiz != null && ActiveQuiz != this)
-    {
-        // Some other quiz is already running
-        Debug.LogWarning("Another quiz is active. Disabling this one.");
-        this.enabled = false;
-        return;
-    }
-
-    ActiveQuiz = this;    
-    audioSource = GetComponent<AudioSource>(); // Ensure you have an AudioSource component attached
-        if (audioSource == null)
         {
-            gameObject.AddComponent<AudioSource>();
-            audioSource = GetComponent<AudioSource>();
+            Debug.LogWarning("Another quiz is active. Disabling this one.");
+            this.enabled = false;
+            return;
         }
+
+        ActiveQuiz = this;
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
+        if (quizData != null)
+        {
+            questionsPerRound = quizData.questionsPerRound;
+            pointsPerCorrect = quizData.pointsPerCorrectAnswer;
+        }
+
         InitializeQuiz();
         DisplayNextQuestion();
     }
-    private void Awake()
-{
-    if(ActiveQuiz == null)
-    {
-        ActiveQuiz = this;
-    }
-    else
-    {
-        Debug.LogWarning("Multiple quizzes trying to become active. Overriding with latest.");
-        ActiveQuiz = this;
-    }
-}
- private void InitializeQuiz()
-{
-    Shuffle(questions);
-    Debug.Log("Initializing quiz. Total questions: " + questions.Count);
 
-    for (int i = 0; i < 5; i++)
+    private void InitializeQuiz()
     {
-        Debug.Log("Adding question #" + i);
-        selectedQuestions.Add(questions[i]);
-    }
-}
+        selectedQuestions.Clear();
+        Shuffle(questions);
 
+        int count = Mathf.Min(questionsPerRound, questions.Count);
+        for (int i = 0; i < count; i++)
+        {
+            questions[i].HasBeenAsked = false;
+            questions[i].UserGotItRight = false;
+            selectedQuestions.Add(questions[i]);
+        }
+    }
 
     public void DisplayNextQuestion()
     {
         if (currentQuestionIndex >= selectedQuestions.Count)
-    {
-        quizFinished = true;  // Update the flag here
-        FinishQuiz();
-        return;
-    }    
-        if (currentQuestionIndex >= selectedQuestions.Count)
         {
+            quizFinished = true;
             FinishQuiz();
             return;
         }
@@ -104,6 +108,7 @@ public class QuizManager : MonoBehaviour
         }
 
         selectedQuestions[currentQuestionIndex].QuestionCanvas.SetActive(true);
+        UpdateQuestionCountDisplay();
         currentQuestionIndex++;
     }
 
@@ -112,50 +117,52 @@ public class QuizManager : MonoBehaviour
         if (quizFinished) return;
 
         Question currentQuestion = selectedQuestions[currentQuestionIndex - 1];
-        
+        currentQuestion.HasBeenAsked = true;
+
         if (userAnswer == currentQuestion.CorrectAnswer)
         {
-            score += 20;
+            currentQuestion.UserGotItRight = true;
+            score += pointsPerCorrect;
             UpdateScoreDisplay();
             ShowCorrectAnswerFeedback();
         }
         else
         {
+            currentQuestion.UserGotItRight = false;
             ShowIncorrectAnswerFeedback();
         }
 
-        // Wait for 1 second (via coroutine) before displaying the next question
         StartCoroutine(WaitAndDisplayNext());
     }
 
-    IEnumerator WaitAndDisplayNext()
+    private IEnumerator WaitAndDisplayNext()
     {
         yield return new WaitForSeconds(1);
         DisplayNextQuestion();
     }
 
-    void ShowCorrectAnswerFeedback()
+    private void ShowCorrectAnswerFeedback()
     {
-    correctScreen.SetActive(true);
-    audioSource.PlayOneShot(correctSound);
+        correctScreen.SetActive(true);
+        audioSource.PlayOneShot(correctSound);
 
-    // Instantiate the particle effect at the correctScreen's position
-    GameObject particleInstance = Instantiate(correctAnswerParticleEffect, correctScreen.transform.position, Quaternion.identity);
-    Destroy(particleInstance, 5f); // Destroy the instance after 5 seconds. Adjust time as needed.
+        if (correctAnswerParticleEffect != null)
+        {
+            GameObject particleInstance = Instantiate(correctAnswerParticleEffect, correctScreen.transform.position, Quaternion.identity);
+            Destroy(particleInstance, 5f);
+        }
 
-    // Optionally disable the screen after some time
-    StartCoroutine(DisableAfterDelay(correctScreen, 1f));
+        StartCoroutine(DisableAfterDelay(correctScreen, 1f));
     }
 
-    void ShowIncorrectAnswerFeedback()
+    private void ShowIncorrectAnswerFeedback()
     {
         incorrectScreen.SetActive(true);
         audioSource.PlayOneShot(incorrectSound);
-        // Optionally disable the screen after some time
         StartCoroutine(DisableAfterDelay(incorrectScreen, 1f));
     }
 
-    IEnumerator DisableAfterDelay(GameObject obj, float delay)
+    private IEnumerator DisableAfterDelay(GameObject obj, float delay)
     {
         yield return new WaitForSeconds(delay);
         obj.SetActive(false);
@@ -163,36 +170,21 @@ public class QuizManager : MonoBehaviour
 
     public void ReloadQuiz()
     {
-    // 1. Reset score
-    score = 0;
-    UpdateScoreDisplay();
-     reloadQuizPanel.SetActive(false);
+        score = 0;
+        UpdateScoreDisplay();
+        reloadQuizPanel.SetActive(false);
 
-    // 2. Turn off all currently active questions
-    foreach (var q in selectedQuestions)
-    {
-        q.QuestionCanvas.SetActive(false);
-    }
+        foreach (var q in selectedQuestions)
+        {
+            q.QuestionCanvas.SetActive(false);
+        }
 
-    // 3. Clear selected questions list
-    selectedQuestions.Clear();
+        currentQuestionIndex = 0;
+        quizFinished = false;
+        ActiveQuiz = this;
 
-    // 4. Shuffle and select new set of 5 random questions
-    Shuffle(questions);
-    for (int i = 0; i < 5; i++)
-    {
-        selectedQuestions.Add(questions[i]);
-    }
-    ActiveQuiz = this;
-
-    // 5. Reset question index
-    currentQuestionIndex = 0;
-
-    // 6. Display the first question
-    DisplayNextQuestion();
-
-    // Also reset the quizFinished flag
-    quizFinished = false;
+        InitializeQuiz();
+        DisplayNextQuestion();
     }
 
     private void UpdateScoreDisplay()
@@ -200,14 +192,27 @@ public class QuizManager : MonoBehaviour
         scoreText.text = "Score: " + score;
     }
 
+    private void UpdateQuestionCountDisplay()
+    {
+        if (questionCountText != null)
+            questionCountText.text = (currentQuestionIndex + 1) + " / " + selectedQuestions.Count;
+    }
 
     private void FinishQuiz()
     {
-        ActiveQuiz = null;    
-    Debug.Log("Quiz Finished!");
-        // You can expand this later to handle the end of the quiz
-            // Activate the "Reload Quiz" panel
-    reloadQuizPanel.SetActive(true);
+        string quizName = quizData != null ? quizData.quizName : gameObject.name;
+        int maxScore = selectedQuestions.Count * pointsPerCorrect;
+
+        if (ProgressManager.Instance != null)
+        {
+            ProgressManager.Instance.SaveQuizResult(quizName, score, maxScore);
+
+            if (bestScoreText != null)
+                bestScoreText.text = "Best: " + ProgressManager.Instance.GetBestScore(quizName);
+        }
+
+        ActiveQuiz = null;
+        reloadQuizPanel.SetActive(true);
     }
 
     private void Shuffle<T>(List<T> list)

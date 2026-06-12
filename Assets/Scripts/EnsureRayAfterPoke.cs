@@ -1,36 +1,13 @@
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
+/// <summary>
+/// This script was used with XRI to re-enable ray interactor after poke.
+/// With Meta Interaction SDK, the OVRCameraRigInteraction prefab handles
+/// interactor switching automatically. This script is no longer needed
+/// but is kept for backward compatibility.
+/// </summary>
 public class EnsureRayAfterPoke : MonoBehaviour
 {
-    private XRDirectInteractor directInteractor;
-    private XRRayInteractor rayInteractor;
-
-    private void Awake()
-    {
-        directInteractor = GetComponent<XRDirectInteractor>();
-        rayInteractor = GetComponent<XRRayInteractor>();
-
-        if (directInteractor)
-        {
-            directInteractor.onSelectExited.AddListener(OnPokeEnd);
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if (directInteractor)
-        {
-            directInteractor.onSelectExited.RemoveListener(OnPokeEnd);
-        }
-    }
-
-    private void OnPokeEnd(XRBaseInteractable interactable)
-    {
-        if (rayInteractor)
-        {
-            rayInteractor.enabled = true; // Ensure the ray interactor is enabled after a poke interaction ends
-        }
-    }
+    // Meta Interaction SDK handles poke/ray switching automatically
+    // via its built-in interactor group logic. No custom code needed.
 }
-

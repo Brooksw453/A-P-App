@@ -3,21 +3,22 @@ using System.Collections.Generic;
 
 public class MenuManager : MonoBehaviour
 {
-    [SerializeField] private List<GameObject> menus;  // List of all your menus
+    [SerializeField] private List<GameObject> menus;
+    [SerializeField] private int homeMenuIndex = 0;
 
     private List<GameObject> openedMenus = new List<GameObject>();
-
     private bool isToggled = false;
+    private int currentMenuIndex = -1;
 
     private void Start()
-{
-    SetupInitialMenus();
-}
+    {
+        SetupInitialMenus();
+    }
+
     public void ToggleMenus()
     {
         if (isToggled)
         {
-            // Reopen all previously opened menus
             foreach (GameObject menu in openedMenus)
             {
                 menu.SetActive(true);
@@ -26,7 +27,6 @@ public class MenuManager : MonoBehaviour
         }
         else
         {
-            // Store currently opened menus and then close them
             foreach (GameObject menu in menus)
             {
                 if (menu.activeInHierarchy)
@@ -36,19 +36,46 @@ public class MenuManager : MonoBehaviour
                 }
             }
         }
-        
+
         isToggled = !isToggled;
     }
 
-    // Called when your app starts to ensure the home menu is open and others are closed
+    public void ShowMenu(int index)
+    {
+        if (index < 0 || index >= menus.Count) return;
+
+        for (int i = 0; i < menus.Count; i++)
+        {
+            menus[i].SetActive(i == index);
+        }
+        currentMenuIndex = index;
+    }
+
+    public void ShowMenu(GameObject menu)
+    {
+        foreach (GameObject m in menus)
+        {
+            m.SetActive(m == menu);
+        }
+        currentMenuIndex = menus.IndexOf(menu);
+    }
+
+    public void GoHome()
+    {
+        ShowMenu(homeMenuIndex);
+    }
+
     public void SetupInitialMenus()
     {
         foreach (GameObject menu in menus)
         {
-            menu.SetActive(false);  // close all menus
+            menu.SetActive(false);
         }
-        
-        menus[0].SetActive(true);  // assuming the home menu is the first in the list
+
+        if (menus.Count > homeMenuIndex)
+        {
+            menus[homeMenuIndex].SetActive(true);
+            currentMenuIndex = homeMenuIndex;
+        }
     }
 }
-
