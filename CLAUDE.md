@@ -8,6 +8,69 @@ Keep it updated as the project evolves.
 
 ## 0. ⏭️ RESUME HERE — first move in a fresh chat (saved end of 2026-06-12, marathon #2)
 
+> **▶️ RESUME NEXT (session-end 2026-06-13 — Android `level0` crash SOLVED ✅):** Root cause was a **stale
+> hand-migrated OVR rig** (full saga in the marathon-#4 notes below). The MR scene is rebuilt and **verified on
+> the Quest**: fresh **Meta Building Blocks** Camera Rig + Passthrough, **skull resized to ~life-size**, **14
+> labels + BoneTargets regenerated**, **Poke Tip** re-added (script renamed `PokeInput.cs`→`PokeTip.cs` so the
+> `PokeTip` MonoBehaviour is Add-Component-able — class name must == file name). On-device confirmed: **skull +
+> labels render in full passthrough (look great)**; `[APLab] Starting module … 14 bone targets` runs; no crash.
+> **2 OPEN ISSUES before the poke test works (Brooks flagged):** (1) **hands keep changing color** — the Building
+> Blocks hand-tracking visual; investigate the hand material / tracking-confidence state. (2) **Poke Tip is
+> invisible** (it's just a trigger collider) — **add a small visible marker** (a little sphere mesh on the
+> `Poke Tip` object, ~collider size, maybe emissive) so you can see where to poke. **NEXT:** add that poke-tip
+> visual → rebuild → poke the **Mandible** at Practice 1/6 (expect green flash + advance to 2/6). **Cleanup:**
+> delete the throwaway `_Probe.unity`. Sideload + **launch-while-worn** recipe is in the marathon-#4 notes / §6.
+
+> **🔴 UPDATE (marathon #4, 2026-06-13):** The full `Library` wipe + clean rebuild **did NOT fix `level0`** — the
+> freshly-built APK crashes identically (`level0 corrupted / Position out of bounds`, `SIGTRAP` in
+> `Loading.Preload`). **So a build *cache* is ruled out.** Cheap analysis this session also ruled out: oversized/
+> baked scene data (longest scene line = 128 chars; no baked mesh/TMP geometry), custom-script serialization
+> (`LabelInfo`/`LabelBillboard`/`BoneTarget`/`ModuleHost` clean — no `[SerializeReference]`/
+> `ISerializationCallbackReceiver`), the force-included `Assets/Resources` (only small Meta/OVR `.asset`
+> settings), build-time errors (build log clean — the Editor.log errors are just in-Editor Play-mode OpenXR
+> "no runtime" noise), and Split-Application-Binary/OBB. **`level0` is physically in the APK but malformed.**
+> **RESULT (marathon #4):** Deleted the `Skeletal Labels` root, rebuilt, sideloaded — **STILL crashes with the
+> identical `level0 corrupted`** once launched correctly. **So the label rig is NOT the cause.** Two very
+> different scene contents corrupt `level0` *identically* → leans toward a **project-wide build-pipeline issue**.
+> ⚠️ **LAUNCH-WHILE-WORN GOTCHA (new):** adb-launching this app while the headset is asleep/off hangs Unity at
+> early init (no display surface) → 5 s `FocusEvent` **ANR**, and it never reaches scene-load — which masked the
+> crash and briefly looked like a fix. **Always launch while the headset is worn + awake** (`am force-stop`
+> first, then `monkey`, with Brooks wearing it). **NEXT = step-7 empty-scene isolation test:** build a trivial
+> `_Probe` scene as the ONLY enabled build scene, launch-while-worn. Empty ALSO corrupts ⇒ pipeline (attack
+> Player/build settings, Unity version, packages, IL2CPP); empty runs ⇒ base-scene content (bisect OVR rig /
+> skull / ModuleHost). adb recipe below works (device `230YC01DC1013Q`, pkg `com.ESD.AP.lab`).
+>
+> **✅ EMPTY-SCENE PROBE RAN CLEAN (marathon #4):** a trivial `_Probe` scene boots on the Quest with **no
+> `level0` crash** ⇒ **NOT the build pipeline — the corruption is `Module_Skeletal` CONTENT.** Base scene (after
+> label deletion) = **`MR Camera Rig`** (the OVR/passthrough prefab, GUID `126d619c…`) + **`Skull`**
+> (`Skull_full.prefab`) + `Module Host` + `Directional Light`. **Prime suspect = `MR Camera Rig`** — it's the
+> one serializing **Meta-package enums** (the documented "By Design" cause), likely made **stale by the
+> OpenXR→Meta XR migration**. **NEXT cut:** delete `MR Camera Rig`, set `Module_Skeletal` back as the build scene
+> (last build was `_Probe`!), rebuild → **boots ⇒ rig confirmed** (drop in a fresh Meta passthrough rig via
+> Building Blocks); **still crashes ⇒ it's the `Skull` prefab.** Reminder: **always launch while worn.**
+>
+> **🎯 SOLVED (marathon #4): the `MR Camera Rig` was the cause.** Minus-rig `Module_Skeletal` boots clean — NO
+> `level0` crash; `[APLab] Starting module 'Skeletal System: Skull & Bones'` runs on-device (Learn→Practice,
+> "Practice 1/6: Select the ONLY moveable bone… answer Mandible"; 0 bone targets only because labels were also
+> deleted). **ROOT CAUSE = a stale Meta/OVR passthrough rig (`MR Camera Rig`, prefab GUID `126d619c…`) left from
+> the OpenXR→Meta XR migration, serializing a player-incompatible type (Unity's "By Design" package-enum bug).**
+> Without a rig the build is flat/head-locked & no passthrough (expected — the rig holds the tracked camera +
+> passthrough layer). **FIX PATH:** (1) add a FRESH passthrough rig via **Meta XR Building Blocks** (Camera Rig +
+> Passthrough blocks — a current-package rig has no stale enums); (2) regenerate labels via menu *A&P Lab/
+> Generate Skeletal Labels* (restores BoneTargets); (3) re-parent **Poke Tip** under the new rig's
+> `RightHandAnchor`. NOTE: orphaned hand-anchor objects (`*HandOnControllerAnchor`, `*HandAnchorDetached`,
+> `*ControllerInHandAnchor`) survived the rig deletion — clean those up when adding the new rig.
+>
+> **✅ FRESH RIG CONFIRMED WORKING ON-DEVICE (marathon #4):** Building Blocks **Camera Rig + Passthrough** →
+> NO crash; MR service logs `[Passthrough] -> Started` for our pkg; `[APLab] Starting module` runs; and **Brooks
+> confirms the skull floating in his room in full passthrough + proper head-tracked 3D** (stays put when he
+> moves; good seated height/placement). **THE ANDROID `level0` WALL IS DOWN.** Remaining tuning + build-back:
+> skull renders **~half life-size** → scale `Skull` ~2× toward ~0.21 m tall **before** regenerating labels (so
+> targets fit); then menu *A&P Lab/Generate Skeletal Labels* (restores BoneTargets), re-parent **Poke Tip** under
+> the new rig's `RightHandAnchor`, delete leftover orphan hand-anchors, rebuild → poke test.
+> **LESSON (Brooks's call, now proven): add Meta rigs via Building Blocks — a clean current-package rig — and
+> never hand-migrate an OVR rig (the hand-migrated one is what went stale and corrupted `level0`).**
+
 **Where we are:** **Slice 1** of the bone-ID Practice (§9 step 2) is **built and verified in the Editor** —
 autoSelfTest ran the full `Learn→Practice→Assess→Results` flow on-device-of-the-editor (practical = 77%). The
 whole framework now runs **data-driven off `skeletal-system.json`**. The one remaining wall is **getting the
@@ -17,14 +80,20 @@ Meta MR Utility Kit, then **crashes while loading the scene**:
 
 `level0` = the `Module_Skeletal` scene baked into the APK. This is **a corrupt build artifact, NOT our code**
 (the scene loads perfectly in the Editor; disk has 1.3 TB free). It survived a player-data cache clear
-(`Library/PlayerDataCache` + `BuildPlayerData`), so the next step is a **full clean**. *(No MCP bridge needed
-for this — it's all file ops + adb.)*
+(`Library/PlayerDataCache` + `BuildPlayerData`), so the next step was a **full clean** — **now DONE** (the whole
+`Library/` was wiped this session; see the NEXT MOVE step 1). The ball is in Brooks's court to reopen Unity +
+rebuild. *(No MCP bridge needed for this — it's all file ops + adb.)*
 
 **THE NEXT MOVE — full clean rebuild, then sideload:**
-1. **Close Unity. Delete the entire `A-P-App/Library/` folder** (forces a full reimport that regenerates
-   `level0` from source). *Cheaper thing to try first if you like: reopen → open `Module_Skeletal` → Ctrl+S to
-   re-save → rebuild. But the `Library` wipe is the reliable cure for "level0 corrupted."*
-2. **Reopen Unity** — long reimport; let it settle (the Meta XR audio updater churns — normal).
+1. ✅ **DONE (marathon #3, 2026-06-12):** Unity was confirmed closed (no `Temp/UnityLockfile`) and the entire
+   `A-P-App/Library/` (24.8 GB) was wiped clean — plus `Temp/` and `obj/` — via robocopy empty-mirror. Source
+   (`Assets`, `Packages`, `ProjectSettings`, the scene + generator) untouched. **So the next person starts at
+   step 2.** *(Pre-checked the scene for the step-7 suspects: it's structurally clean — 53 GameObjects, 14
+   LineRenderer leader lines, 28 inline label materials, 15 SphereCollider bone-targets, **no baked Mesh blobs**,
+   only 1 harmless zero-guid ref. Confirms the corruption was a build-cache artifact, not scene content — if the
+   rebuild somehow STILL corrupts, the 28 inline label materials are the prime suspect for the step-7 bisect.)*
+2. **Reopen Unity** — long reimport (full 24.8 GB regen — expect 30–60 min); let it settle (the Meta XR audio
+   updater churns — normal).
 3. **Re-enter keystore passwords** (they do **NOT** persist across Unity restarts — this bit us): Project
    Settings → Player → **Publishing Settings** → Keystore password + Key alias **`ap key`** password.
    Keystore: `C:\Users\brook\GitHub\Local Keystores\A-P  Lab Keystore 26.keystore` (note the double space).
@@ -244,6 +313,23 @@ don't fan out parallel agents onto it). Claude can't see headset output — the 
   parked for the per-bone explode/place lab later).
 - Repo has historical line-ending churn; a proper `.gitattributes` pass is still pending. `.utmp/` (Android
   build scratch) is now in `.gitignore`.
+- 🧹 **Asset-Store bloat to delete (planned cleanup — noted 2026-06-13; do AFTER a confirmed-running APK, not
+  before — change one variable at a time).** `Assets/Unity Asset Store/` is **6.0 GB of the 6.6 GB total
+  `Assets/`** — almost all unrelated to anatomy, and the main reason `Library` reimports / Android platform
+  switches are slow (every `Library` wipe re-imports all of it). It does **NOT** bloat the APK (Unity only
+  packages assets the build scene references) **except `Overhead Crane`**, which has a `Resources/` subfolder
+  that ships in every build regardless. **Brooks owns all these packs on the Unity Asset Store, so any can be
+  reimported anytime — deletion is safe and fully reversible.**
+  - **DELETE (~4.5 GB, zero anatomy):** SuburbNeighborhoodHousePack (3.1 GB), RealisticKitchenPack (671 MB),
+    Overhead Crane (279 MB — also un-ships it from the APK), Butterfly Animated (166 MB), Wood Boat Lowpoly
+    (141 MB), Simple Garage (119 MB), Retro Cartoon Car Cicada (92 MB), Enemy_Spikeball, Fire, Sherbbs Particles.
+  - **KEEP — in use now:** `Anatomical_Human_Skeleton` (750 MB — the `Skull_full` pilot model).
+  - **KEEP — raw material for Season-1 modules:** Heart URP, motion open heart, Human Body Anatomy Male,
+    RIG Female Dissection, Operation room - surgery, Scalpels, Skin model.
+  - **Method:** ask Claude to generate the exact GUID-referenced keep/delete manifest from `Module_Skeletal`
+    first; delete each folder **with its `.meta`** (or via the Unity Project window) with the scene closed/Unity
+    closed; commit right after as a revertible checkpoint. Also check the top-level `Assets/Resources` (could be
+    ours or more shipped junk).
 
 ## 9. Next steps (in order)
 
