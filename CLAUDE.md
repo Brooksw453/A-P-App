@@ -8,6 +8,28 @@ Keep it updated as the project evolves.
 
 ## 0. ⏭️ RESUME HERE — first move in a fresh chat (saved end of 2026-06-12, marathon #2)
 
+> **▶️ RESUME NEXT (marathon #5, 2026-06-13 — STABLE on Quest; poke mechanic WORKS ✅):** On-device confirmed:
+> **skull is stable in passthrough** (no fly-up), sits at a comfortable seated distance, **14 labeled bone dots**,
+> and the **bone-ID Practice works** — poked the **Mandible** → green flash → advanced 1/6→2/6 (`[APLab] ✓ Mandible
+> award=1.00`). Stable commits on `meta-xr-migration`: **`03477fc6`** (static visible poke-tip sphere) ·
+> **`c49838f6`** (skull+labels moved ~0.25m back for reach) · **`151d7b67`** (fresh Meta Building Blocks rig).
+>
+> 🔑 **THE "SKULL FLIES UP ~100ft" DRIFT — ROOT CAUSE FOUND (cost us ~10 builds):** it was **runtime
+> `GameObject.CreatePrimitive(Sphere)` in `PokeTip.Awake()`** — creating a collider-bearing object **at startup on
+> an object parented under the Meta XR rig** disrupts the rig's tracking-origin init, so the whole world launches
+> upward. **100% correlated across all 10 builds** (marker code present ⟺ drift; absent ⟺ stable). ⚠️ **The scene
+> "save reshuffles 8600 lines" and "can't save in Unity" theories were RED HERRINGS** — saving is fine; those
+> drift builds just also had the marker code. **RULE: never spawn objects at runtime under the XR rig during
+> Awake/Start; add visible helpers as STATIC scene meshes** (that's how the cyan/poke-tip ball was finally added —
+> a plain Sphere child of `Poke Tip`, collider deleted, in the scene). **Always Build (NOT Build-And-Run — that
+> auto-launches on the desk, not worn, and also corrupts the origin); launch WHILE WORN; sideload via adb.**
+>
+> **OPEN follow-ups (small):** (1) the visible tip **ball isn't co-located with the `Poke Tip` trigger collider**
+> (trigger sits ~at the hand) — align them (move the ball to the trigger, or the trigger out to the ball ~z 0.12).
+> (2) **Deep/back bones unreachable** on a solid skull (occipital=back, sphenoid/ethmoid/vomer=internal) — the
+> **exploded skull** is the real next feature (also powers the "place mandible in socket" step). (3) Wire
+> **result-sync** to `vr-sync-result`. Editing+saving in Unity is back to normal.
+>
 > **▶️ RESUME NEXT (session-end 2026-06-13 — Android `level0` crash SOLVED ✅):** Root cause was a **stale
 > hand-migrated OVR rig** (full saga in the marathon-#4 notes below). The MR scene is rebuilt and **verified on
 > the Quest**: fresh **Meta Building Blocks** Camera Rig + Passthrough, **skull resized to ~life-size**, **14
