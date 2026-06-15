@@ -3,9 +3,10 @@
 // the learner through the phases, binding the Practice steps to pokeable BoneTargets
 // on the labeled skull.
 //
-// Slice 1 (now): full Practice loop — arm the bone targets, score each IdentifyPart
-// step via ModuleRunner.RecordPracticalStep, then compute results. Learn is auto-
-// completed and the quiz is recorded empty until slices 2–3 add their UI.
+// Practice: arm the bone targets, score each IdentifyPart step via
+// ModuleRunner.RecordPracticalStep. Assess: run the world-space QuizPanel and feed
+// the score to ModuleRunner.RecordQuiz, then compute results. Learn is still auto-
+// completed (slice 2 adds the Learn intro UI).
 //
 // autoSelfTest drives perfect play (auto-pokes the correct bone each step) so the
 // whole flow can be exercised in Play mode and checked from the console.
@@ -28,9 +29,15 @@ namespace APLab.View
 
         [Header("Flow")]
         public bool autoStartOnPlay = true;
-        [Tooltip("Auto-poke the correct bone each Practice step (for editor verification).")]
+        [Tooltip("Auto-poke the correct bone each Practice step, and auto-answer the quiz " +
+                 "(for editor verification of the whole flow).")]
         public bool autoSelfTest = false;
         public int maxAttemptsPerStep = 3;
+
+        [Header("Assess")]
+        [Tooltip("World-space quiz UI for the Assess phase (build via menu A&P Lab/Build Quiz " +
+                 "Panel). If empty, the Assess phase records 0/0 and mastery is practical-only.")]
+        public QuizPanel quizPanel;
 
         ModuleRunner _runner;
         ModuleDefinition _def;
@@ -55,6 +62,8 @@ namespace APLab.View
             _runner.OnResults += OnResults;
 
             GatherTargets();
+            if (quizPanel == null)
+                quizPanel = FindFirstObjectByType<QuizPanel>(FindObjectsInactive.Include);
 
             var session = APLabManager.Instance != null ? APLabManager.Instance.Session : null;
             Debug.Log($"[APLab] Starting module '{_def.title}' — {_targets.Count} bone targets, " +
@@ -93,10 +102,30 @@ namespace APLab.View
                     BeginPracticeStep(0);
                     break;
                 case ModulePhase.Assess:
-                    _runner.RecordQuiz(0, 0);         // slice 1: no quiz yet (slice 3 adds it)
-                    _runner.Finish();
+                    BeginAssess();
                     break;
             }
+        }
+
+        // Run the in-headset quiz, then record the score and finish. Falls back to an
+        // empty quiz (0/0, practical-only mastery) when no panel is present.
+        void BeginAssess()
+        {
+            bool hasQuiz = quizPanel != null && _def.quiz != null &&
+                           _def.quiz.questions != null && _def.quiz.questions.Count > 0;
+            if (!hasQuiz)
+            {
+                if (quizPanel == null) Debug.Log("[APLab] Assess: no quiz panel — recording 0/0.");
+                _runner.RecordQuiz(0, 0);
+                _runner.Finish();
+                return;
+            }
+
+            quizPanel.Begin(_def.quiz, autoSelfTest, (correct, total) =>
+            {
+                _runner.RecordQuiz(correct, total);
+                _runner.Finish();
+            });
         }
 
         void BeginPracticeStep(int i)
