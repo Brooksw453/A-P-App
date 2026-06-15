@@ -13,7 +13,8 @@
 // Placement is tuned for the seated MR layout (skull ~[0,1.1,0.4] facing the user
 // on the -Z side). The panel sits in front of the user, a bit nearer than the
 // skull. Numbers are first-pass — nudge the "Quiz Panel" transform in the Editor
-// and re-run, or just move it live.
+// and re-run, or just move it live. (ModuleHost hides the bone labels during the
+// Assess phase so this panel is the focus.)
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,7 +27,7 @@ public static class QuizPanelBuilder
     const string PanelName = "Quiz Panel";
     static readonly Vector3 PanelPos = new Vector3(0f, 1.15f, 0.12f);
 
-    const float PanelWidth = 0.62f;
+    const float PanelWidth = 0.72f;
     const int   OptionSlots = 4;     // max answer options supported per question
 
     [MenuItem("A&P Lab/Build Quiz Panel")]
@@ -44,19 +45,19 @@ public static class QuizPanelBuilder
         root.transform.rotation = Quaternion.identity;   // readable face toward the -Z user
 
         // Backboard (non-pokeable). Sits behind everything (+Z, away from the user).
-        MakeQuad("Board", root.transform, new Vector3(0f, -0.02f, 0.02f),
-            new Vector2(PanelWidth + 0.02f, 0.56f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
+        MakeQuad("Board", root.transform, new Vector3(0f, -0.05f, 0.02f),
+            new Vector2(PanelWidth + 0.02f, 0.74f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
 
         // Progress readout (top).
-        var ptmp = MakeText("Progress", root.transform, new Vector3(0f, 0.205f, 0f),
-            new Vector2(PanelWidth - 0.06f, 0.045f), 0.035f, TextAlignmentOptions.Center, font);
+        var ptmp = MakeText("Progress", root.transform, new Vector3(0f, 0.255f, 0f),
+            new Vector2(PanelWidth - 0.06f, 0.06f), 0.055f, TextAlignmentOptions.Center, font);
         ptmp.color = new Color(0.70f, 0.78f, 0.92f);
         ptmp.text = "Question 1 / 5";
         ptmp.ForceMeshUpdate();
 
         // Question prompt.
-        var qtmp = MakeText("Question", root.transform, new Vector3(0f, 0.12f, 0f),
-            new Vector2(PanelWidth - 0.05f, 0.16f), 0.075f, TextAlignmentOptions.Center, font);
+        var qtmp = MakeText("Question", root.transform, new Vector3(0f, 0.145f, 0f),
+            new Vector2(PanelWidth - 0.05f, 0.20f), 0.11f, TextAlignmentOptions.Center, font);
         qtmp.text = "The question prompt appears here.";
         qtmp.ForceMeshUpdate();
 
@@ -66,7 +67,7 @@ public static class QuizPanelBuilder
         panel.options = new List<QuizOption>();
 
         // Answer buttons, stacked.
-        const float btnW = 0.56f, btnH = 0.075f, gap = 0.014f, top = 0.02f;
+        const float btnW = 0.66f, btnH = 0.092f, gap = 0.018f, top = 0.0f;
         for (int i = 0; i < OptionSlots; i++)
         {
             float y = top - i * (btnH + gap);
@@ -83,7 +84,7 @@ public static class QuizPanelBuilder
                 new Vector2(btnW, btnH), new Color(0.16f, 0.18f, 0.24f, 1f), unlit);
 
             var otmp = MakeText("Label", btn.transform, new Vector3(0f, 0f, 0f),
-                new Vector2(btnW - 0.03f, btnH), 0.05f, TextAlignmentOptions.Center, font);
+                new Vector2(btnW - 0.03f, btnH), 0.12f, TextAlignmentOptions.Center, font);
             otmp.text = $"Answer option {i + 1}";
             otmp.ForceMeshUpdate();
 
@@ -145,7 +146,7 @@ public static class QuizPanelBuilder
         tmp.alignment = align;
         tmp.rectTransform.sizeDelta = size;
         tmp.enableAutoSizing = true;
-        tmp.fontSizeMin = Mathf.Max(0.01f, fontSizeMax * 0.4f);
+        tmp.fontSizeMin = Mathf.Max(0.01f, fontSizeMax * 0.45f);
         tmp.fontSizeMax = fontSizeMax;
         tmp.fontSize = fontSizeMax;
         return tmp;

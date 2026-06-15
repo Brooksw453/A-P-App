@@ -121,6 +121,9 @@ namespace APLab.View
                 return;
             }
 
+            // Declutter: hide the labeled skull markers so the quiz panel is the focus.
+            if (labelsRoot != null) labelsRoot.gameObject.SetActive(false);
+
             quizPanel.Begin(_def.quiz, autoSelfTest, (correct, total) =>
             {
                 _runner.RecordQuiz(correct, total);
