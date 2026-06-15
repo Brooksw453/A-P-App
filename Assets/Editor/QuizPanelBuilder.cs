@@ -8,10 +8,11 @@
 // rig corrupted the tracking origin ("skull flies up"). Everything pokeable is
 // authored here as scene geometry; QuizPanel only fills text + arms it.
 //
-// TMP is configured in code (font + autosize + ForceMeshUpdate) so it renders
-// reliably. NOTE on sizing: autosize fits text to its RectTransform, so the box
-// size — not just fontSizeMax — sets how big the text reads. The QUESTION and the
-// BANNER get large boxes (long text) while the short answers fill their buttons.
+// TEXT SIZING (hard-won): TMP autosize fits text to its box, so a LONG question
+// gets shrunk small while SHORT answers stay near max. To keep the question legible
+// we set a high autosize FLOOR (fontSizeMin) so it can't shrink below the readable
+// answer-text size — it overflows its box downward for very long questions instead.
+// The panel is therefore tall. NOTE: exact sizes still want an on-device confirm.
 //
 // Placement: ModuleHost moves the panel to the skull's spot and the banner above it
 // at runtime, so these positions are fallbacks. Nudge + re-run, or move live.
@@ -29,7 +30,7 @@ public static class QuizPanelBuilder
     // Fallback placement; ModuleHost moves the panel to the skull's spot at runtime.
     static readonly Vector3 PanelPos = new Vector3(0f, 1.15f, 0.45f);
 
-    const float PanelWidth = 0.96f;
+    const float PanelWidth = 0.98f;
     const int   OptionSlots = 4;     // max answer options supported per question
 
     [MenuItem("A&P Lab/Build Quiz Panel")]
@@ -49,19 +50,22 @@ public static class QuizPanelBuilder
         root.transform.rotation = Quaternion.identity;   // readable face toward the -Z user
 
         // Backboard (non-pokeable). Sits behind everything (+Z, away from the user).
-        MakeQuad("Board", root.transform, new Vector3(0f, -0.04f, 0.02f),
-            new Vector2(PanelWidth + 0.04f, 0.90f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
+        MakeQuad("Board", root.transform, new Vector3(0f, -0.03f, 0.02f),
+            new Vector2(PanelWidth + 0.04f, 1.12f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
 
         // Progress readout (top).
-        var ptmp = MakeText("Progress", root.transform, new Vector3(0f, 0.355f, 0f),
+        var ptmp = MakeText("Progress", root.transform, new Vector3(0f, 0.50f, 0f),
             new Vector2(PanelWidth - 0.12f, 0.05f), 0.05f, TextAlignmentOptions.Center, font);
         ptmp.color = new Color(0.70f, 0.78f, 0.92f);
         ptmp.text = "Question 1 / 5";
         ptmp.ForceMeshUpdate();
 
-        // Question prompt — large box so the long text reads big.
-        var qtmp = MakeText("Question", root.transform, new Vector3(0f, 0.18f, 0f),
-            new Vector2(PanelWidth - 0.04f, 0.30f), 0.13f, TextAlignmentOptions.Center, font);
+        // Question prompt — big box AND a high autosize floor so long questions stay
+        // readable (>= the answer-text size) instead of being shrunk tiny.
+        var qtmp = MakeText("Question", root.transform, new Vector3(0f, 0.23f, 0f),
+            new Vector2(PanelWidth - 0.06f, 0.48f), 0.15f, TextAlignmentOptions.Center, font);
+        qtmp.fontSizeMin = 0.105f;   // floor: never smaller than the answers read at
+        qtmp.fontSizeMax = 0.15f;
         qtmp.text = "The question prompt appears here.";
         qtmp.ForceMeshUpdate();
 
@@ -70,8 +74,8 @@ public static class QuizPanelBuilder
         panel.progressText = ptmp;
         panel.options = new List<QuizOption>();
 
-        // Answer buttons, stacked.
-        const float btnW = 0.88f, btnH = 0.105f, gap = 0.022f, top = -0.05f;
+        // Answer buttons, stacked below the question.
+        const float btnW = 0.90f, btnH = 0.11f, gap = 0.022f, top = -0.06f;
         for (int i = 0; i < OptionSlots; i++)
         {
             float y = top - i * (btnH + gap);
@@ -102,13 +106,14 @@ public static class QuizPanelBuilder
 
         // Practice-phase instruction banner (a separate root object). ModuleHost shows it
         // during Practice, repositions it above the skull, and hides it for the quiz.
-        // Large box so the instruction sentence reads big.
         var banner = MakeText(BannerName, null, new Vector3(0f, 1.5f, 0.45f),
-            new Vector2(1.12f, 0.34f), 0.10f, TextAlignmentOptions.Center, font);
+            new Vector2(1.14f, 0.42f), 0.13f, TextAlignmentOptions.Center, font);
+        banner.fontSizeMin = 0.085f;   // same legibility floor for the instruction
+        banner.fontSizeMax = 0.13f;
         banner.text = "Instruction appears here.";
         banner.ForceMeshUpdate();
         MakeQuad("Board", banner.transform, new Vector3(0f, 0f, 0.012f),
-            new Vector2(1.16f, 0.37f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
+            new Vector2(1.18f, 0.45f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
 
         // Wire the panel + banner into the ModuleHost so the phases find them.
         var host = Object.FindFirstObjectByType<ModuleHost>(FindObjectsInactive.Include);
