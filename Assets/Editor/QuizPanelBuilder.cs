@@ -1,20 +1,20 @@
 // A&P Lab — Quiz panel builder.
-// Builds the world-space Assess-phase quiz UI as STATIC scene objects in the open
-// Module_Skeletal scene, and wires it into the ModuleHost. Run via menu:
-// "A&P Lab/Build Quiz Panel".  Re-runnable: rebuilds the "Quiz Panel" root.
+// Builds the world-space Assess-phase quiz UI + the Practice instruction banner as
+// STATIC scene objects in the open Module_Skeletal scene, and wires them into the
+// ModuleHost. Run via menu "A&P Lab/Build Quiz Panel". Re-runnable: rebuilds the
+// "Quiz Panel" and "Instruction Banner" roots.
 //
 // Why an editor command (not runtime): creating colliders at runtime under the XR
 // rig corrupted the tracking origin ("skull flies up"). Everything pokeable is
-// therefore authored here as scene geometry; QuizPanel only fills text + arms it.
+// authored here as scene geometry; QuizPanel only fills text + arms it.
 //
 // TMP is configured in code (font + autosize + ForceMeshUpdate) so it renders
-// reliably — ad-hoc TMP created through the MCP bridge does not.
+// reliably. NOTE on sizing: autosize fits text to its RectTransform, so the box
+// size — not just fontSizeMax — sets how big the text reads. The QUESTION and the
+// BANNER get large boxes (long text) while the short answers fill their buttons.
 //
-// Placement is tuned for the seated MR layout (skull ~[0,1.1,0.4] facing the user
-// on the -Z side). The panel sits in front of the user, a bit nearer than the
-// skull. Numbers are first-pass — nudge the "Quiz Panel" transform in the Editor
-// and re-run, or just move it live. (ModuleHost hides the bone labels during the
-// Assess phase so this panel is the focus.)
+// Placement: ModuleHost moves the panel to the skull's spot and the banner above it
+// at runtime, so these positions are fallbacks. Nudge + re-run, or move live.
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,7 +29,7 @@ public static class QuizPanelBuilder
     // Fallback placement; ModuleHost moves the panel to the skull's spot at runtime.
     static readonly Vector3 PanelPos = new Vector3(0f, 1.15f, 0.45f);
 
-    const float PanelWidth = 0.72f;
+    const float PanelWidth = 0.96f;
     const int   OptionSlots = 4;     // max answer options supported per question
 
     [MenuItem("A&P Lab/Build Quiz Panel")]
@@ -49,19 +49,19 @@ public static class QuizPanelBuilder
         root.transform.rotation = Quaternion.identity;   // readable face toward the -Z user
 
         // Backboard (non-pokeable). Sits behind everything (+Z, away from the user).
-        MakeQuad("Board", root.transform, new Vector3(0f, -0.05f, 0.02f),
-            new Vector2(PanelWidth + 0.02f, 0.74f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
+        MakeQuad("Board", root.transform, new Vector3(0f, -0.04f, 0.02f),
+            new Vector2(PanelWidth + 0.04f, 0.90f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
 
         // Progress readout (top).
-        var ptmp = MakeText("Progress", root.transform, new Vector3(0f, 0.255f, 0f),
-            new Vector2(PanelWidth - 0.06f, 0.06f), 0.055f, TextAlignmentOptions.Center, font);
+        var ptmp = MakeText("Progress", root.transform, new Vector3(0f, 0.355f, 0f),
+            new Vector2(PanelWidth - 0.12f, 0.05f), 0.05f, TextAlignmentOptions.Center, font);
         ptmp.color = new Color(0.70f, 0.78f, 0.92f);
         ptmp.text = "Question 1 / 5";
         ptmp.ForceMeshUpdate();
 
-        // Question prompt.
-        var qtmp = MakeText("Question", root.transform, new Vector3(0f, 0.145f, 0f),
-            new Vector2(PanelWidth - 0.05f, 0.20f), 0.11f, TextAlignmentOptions.Center, font);
+        // Question prompt — large box so the long text reads big.
+        var qtmp = MakeText("Question", root.transform, new Vector3(0f, 0.18f, 0f),
+            new Vector2(PanelWidth - 0.04f, 0.30f), 0.13f, TextAlignmentOptions.Center, font);
         qtmp.text = "The question prompt appears here.";
         qtmp.ForceMeshUpdate();
 
@@ -71,7 +71,7 @@ public static class QuizPanelBuilder
         panel.options = new List<QuizOption>();
 
         // Answer buttons, stacked.
-        const float btnW = 0.66f, btnH = 0.092f, gap = 0.018f, top = 0.0f;
+        const float btnW = 0.88f, btnH = 0.105f, gap = 0.022f, top = -0.05f;
         for (int i = 0; i < OptionSlots; i++)
         {
             float y = top - i * (btnH + gap);
@@ -102,12 +102,13 @@ public static class QuizPanelBuilder
 
         // Practice-phase instruction banner (a separate root object). ModuleHost shows it
         // during Practice, repositions it above the skull, and hides it for the quiz.
+        // Large box so the instruction sentence reads big.
         var banner = MakeText(BannerName, null, new Vector3(0f, 1.5f, 0.45f),
-            new Vector2(0.92f, 0.18f), 0.07f, TextAlignmentOptions.Center, font);
+            new Vector2(1.12f, 0.34f), 0.10f, TextAlignmentOptions.Center, font);
         banner.text = "Instruction appears here.";
         banner.ForceMeshUpdate();
         MakeQuad("Board", banner.transform, new Vector3(0f, 0f, 0.012f),
-            new Vector2(0.96f, 0.21f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
+            new Vector2(1.16f, 0.37f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
 
         // Wire the panel + banner into the ModuleHost so the phases find them.
         var host = Object.FindFirstObjectByType<ModuleHost>(FindObjectsInactive.Include);
@@ -126,7 +127,7 @@ public static class QuizPanelBuilder
         Selection.activeGameObject = root;
         var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
         if (scene.IsValid()) UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
-        Debug.Log("[A&P Lab] Built '" + PanelName + "' with " + OptionSlots + " answer buttons.");
+        Debug.Log("[A&P Lab] Built '" + PanelName + "' + '" + BannerName + "'.");
     }
 
     static GameObject MakeQuad(string name, Transform parent, Vector3 localPos, Vector2 size, Color color, Shader unlit)
@@ -160,7 +161,7 @@ public static class QuizPanelBuilder
         tmp.alignment = align;
         tmp.rectTransform.sizeDelta = size;
         tmp.enableAutoSizing = true;
-        tmp.fontSizeMin = Mathf.Max(0.01f, fontSizeMax * 0.45f);
+        tmp.fontSizeMin = Mathf.Max(0.01f, fontSizeMax * 0.5f);
         tmp.fontSizeMax = fontSizeMax;
         tmp.fontSize = fontSizeMax;
         return tmp;
