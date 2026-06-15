@@ -3,19 +3,20 @@
 // the learner through the phases, binding the Practice steps to pokeable BoneTargets
 // on the labeled skull.
 //
-// Practice: arm the bone targets, score each IdentifyPart step via
-// ModuleRunner.RecordPracticalStep. Assess: run the world-space QuizPanel and feed
-// the score to ModuleRunner.RecordQuiz, then compute results. Learn is still auto-
-// completed (slice 2 adds the Learn intro UI).
+// Practice: show the step instruction on the banner, arm the bone targets, score each
+// IdentifyPart step via ModuleRunner.RecordPracticalStep. Assess: hide the skull +
+// labels, move the QuizPanel to the skull's spot, run it, and feed the score to
+// ModuleRunner.RecordQuiz. Learn is still auto-completed (slice 2 adds the Learn UI).
 //
-// autoSelfTest drives perfect play (auto-pokes the correct bone each step) so the
-// whole flow can be exercised in Play mode and checked from the console.
+// autoSelfTest drives perfect play (auto-pokes the correct bone each step and auto-
+// answers the quiz) so the whole flow can be exercised in Play mode from the console.
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using APLab.Core;
 using APLab.Content;
+using TMPro;
 
 namespace APLab.View
 {
@@ -38,6 +39,12 @@ namespace APLab.View
         [Tooltip("World-space quiz UI for the Assess phase (build via menu A&P Lab/Build Quiz " +
                  "Panel). If empty, the Assess phase records 0/0 and mastery is practical-only.")]
         public QuizPanel quizPanel;
+
+        [Header("Scene refs (auto-found by name if empty)")]
+        [Tooltip("The skull model root ('Skull'). Hidden during the quiz; the panel moves to its spot.")]
+        public Transform modelRoot;
+        [Tooltip("Practice-phase instruction banner (built by A&P Lab/Build Quiz Panel).")]
+        public TextMeshPro instructionText;
 
         ModuleRunner _runner;
         ModuleDefinition _def;
@@ -64,6 +71,16 @@ namespace APLab.View
             GatherTargets();
             if (quizPanel == null)
                 quizPanel = FindFirstObjectByType<QuizPanel>(FindObjectsInactive.Include);
+            if (modelRoot == null)
+            {
+                var s = GameObject.Find("Skull");
+                if (s != null) modelRoot = s.transform;
+            }
+            if (instructionText == null)
+            {
+                var b = GameObject.Find("Instruction Banner");
+                if (b != null) instructionText = b.GetComponent<TextMeshPro>();
+            }
 
             var session = APLabManager.Instance != null ? APLabManager.Instance.Session : null;
             Debug.Log($"[APLab] Starting module '{_def.title}' — {_targets.Count} bone targets, " +
@@ -96,6 +113,7 @@ namespace APLab.View
             switch (phase)
             {
                 case ModulePhase.Learn:
+                    HideInstruction();
                     _runner.CompleteLearn();          // slice 1: skip Learn UI (slice 2 adds it)
                     break;
                 case ModulePhase.Practice:
@@ -121,8 +139,17 @@ namespace APLab.View
                 return;
             }
 
-            // Declutter: hide the labeled skull markers so the quiz panel is the focus.
+            // Clear the stage: hide the practice banner, the labels, and the skull, then
+            // move the quiz panel back to where the skull was so it reads at a comfortable
+            // distance instead of in the learner's face.
+            HideInstruction();
             if (labelsRoot != null) labelsRoot.gameObject.SetActive(false);
+            if (modelRoot != null) modelRoot.gameObject.SetActive(false);
+            if (modelRoot != null && quizPanel != null)
+            {
+                var pp = quizPanel.transform.position;
+                quizPanel.transform.position = new Vector3(modelRoot.position.x, pp.y, modelRoot.position.z);
+            }
 
             quizPanel.Begin(_def.quiz, autoSelfTest, (correct, total) =>
             {
@@ -149,6 +176,7 @@ namespace APLab.View
             _attempts = 0;
             var step = steps[i];
             Debug.Log($"[APLab] Practice {i + 1}/{steps.Count}: \"{step.instruction}\"  (answer: {step.correctKey})");
+            ShowInstruction($"Practice  {i + 1} / {steps.Count}\n{step.instruction}");
 
             // Whole skull is the field — arm every bone; only the right one scores.
             foreach (var t in _targets.Values) t.SetArmed(true);
@@ -203,8 +231,26 @@ namespace APLab.View
             foreach (var t in _targets.Values) t.SetArmed(false);
         }
 
+        void ShowInstruction(string text)
+        {
+            if (instructionText == null) return;
+            if (modelRoot != null)
+                instructionText.transform.position = modelRoot.position + new Vector3(0f, 0.5f, 0f);
+            instructionText.gameObject.SetActive(true);
+            instructionText.text = text;
+            instructionText.ForceMeshUpdate();
+        }
+
+        void HideInstruction()
+        {
+            if (instructionText != null) instructionText.gameObject.SetActive(false);
+        }
+
         void OnResults(RubricResult r)
         {
+            // Restore the skull + labels for the idle end state.
+            if (modelRoot != null) modelRoot.gameObject.SetActive(true);
+            if (labelsRoot != null) labelsRoot.gameObject.SetActive(true);
             Debug.Log($"[APLab] RESULTS — practical {r.PracticalScore:0}%  quiz {r.QuizScore:0}%  " +
                       $"mastery {(r.MasteryScore * 100f):0}%  passed={r.Passed}");
         }

@@ -24,8 +24,10 @@ using APLab.View;
 
 public static class QuizPanelBuilder
 {
-    const string PanelName = "Quiz Panel";
-    static readonly Vector3 PanelPos = new Vector3(0f, 1.15f, 0.12f);
+    const string PanelName  = "Quiz Panel";
+    const string BannerName = "Instruction Banner";
+    // Fallback placement; ModuleHost moves the panel to the skull's spot at runtime.
+    static readonly Vector3 PanelPos = new Vector3(0f, 1.15f, 0.45f);
 
     const float PanelWidth = 0.72f;
     const int   OptionSlots = 4;     // max answer options supported per question
@@ -35,6 +37,8 @@ public static class QuizPanelBuilder
     {
         var old = GameObject.Find(PanelName);
         if (old != null) Object.DestroyImmediate(old);
+        var oldBanner = GameObject.Find(BannerName);
+        if (oldBanner != null) Object.DestroyImmediate(oldBanner);
 
         var unlit = Shader.Find("Universal Render Pipeline/Unlit");
         var font  = TMP_Settings.defaultFontAsset;
@@ -96,17 +100,27 @@ public static class QuizPanelBuilder
             panel.options.Add(opt);
         }
 
-        // Wire the panel into the ModuleHost so the Assess phase finds it.
+        // Practice-phase instruction banner (a separate root object). ModuleHost shows it
+        // during Practice, repositions it above the skull, and hides it for the quiz.
+        var banner = MakeText(BannerName, null, new Vector3(0f, 1.5f, 0.45f),
+            new Vector2(0.92f, 0.18f), 0.07f, TextAlignmentOptions.Center, font);
+        banner.text = "Instruction appears here.";
+        banner.ForceMeshUpdate();
+        MakeQuad("Board", banner.transform, new Vector3(0f, 0f, 0.012f),
+            new Vector2(0.96f, 0.21f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
+
+        // Wire the panel + banner into the ModuleHost so the phases find them.
         var host = Object.FindFirstObjectByType<ModuleHost>(FindObjectsInactive.Include);
         if (host != null)
         {
             host.quizPanel = panel;
+            host.instructionText = banner;
             EditorUtility.SetDirty(host);
-            Debug.Log("[A&P Lab] Quiz Panel wired into ModuleHost.");
+            Debug.Log("[A&P Lab] Quiz Panel + Instruction Banner wired into ModuleHost.");
         }
         else
         {
-            Debug.LogWarning("[A&P Lab] No ModuleHost found — assign 'Quiz Panel' to ModuleHost.quizPanel manually.");
+            Debug.LogWarning("[A&P Lab] No ModuleHost found — assign 'Quiz Panel'/'Instruction Banner' to ModuleHost manually.");
         }
 
         Selection.activeGameObject = root;
