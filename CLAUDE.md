@@ -6,7 +6,35 @@ Keep it updated as the project evolves.
 
 ---
 
-## 0. ⏭️ RESUME HERE — first move in a fresh chat (saved end of 2026-06-12, marathon #2)
+## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-15)
+
+> **▶️ RESUME NEXT (session 2026-06-15 — poke-feel fix + in-headset QUIZ built; needs on-device verify):**
+> Priorities #1 and #2 advanced and **committed on `meta-xr-migration`** — **`cfa5716d`** (poke feel) +
+> **`e1bf6ae2`** (quiz slice). **Pending = Brooks runs Unity once + builds to Quest.** Code-only this session
+> (no bridge needed); Unity was open, scripts importing.
+>
+> 1. **Poke feel (priority #1) — DONE in code.** `PokeTip` now places the trigger sphere AND the visible tip
+>    ball at a shared `tipCenter` (z=0.12) so what you see is what pokes (was: ball not co-located with the
+>    trigger); it auto-finds the visible child sphere if unwired. Bone markers are now a visible ~3 cm sphere
+>    inside a forgiving ~4.2 cm hit zone (was a tiny dot inside a big invisible trigger). ⚠️ **Re-run menu
+>    *A&P Lab/Generate Skeletal Labels*** to regenerate the markers at the new sizes.
+> 2. **Quiz / Assess (priority #2) — BUILT in code.** Assess used to hard-code `RecordQuiz(0,0)` (mastery capped
+>    at practical-only); now it runs a real pokeable multiple-choice panel off `skeletal-system.json` (7 Qs,
+>    round of 5, shuffled). New files: `QuizOption` (pokeable answer button — same `IPokeReceiver`+trigger
+>    contract as `BoneTarget`, so `PokeTip`/`MouseRaySelector` drive it free), `QuizPanel` (round runner,
+>    honors `autoSelfTest`), `QuizPanelBuilder` (menu ***A&P Lab/Build Quiz Panel*** — builds the panel as
+>    STATIC scene objects, the drift-safe way, and auto-wires it into `ModuleHost`), + `ModuleHost.BeginAssess`.
+>    **Run menu *A&P Lab/Build Quiz Panel* once** to create the panel in the scene.
+>
+> **▶️ STEPS (Brooks, ~10 min):** (a) **focus Unity** → it recompiles; tell Claude when done and Claude reads
+> `Editor.log` for `error CS` (no bridge needed). (b) Run **A&P Lab/Generate Skeletal Labels**, then **A&P
+> Lab/Build Quiz Panel**. (c) **Editor self-test:** select `Module Host`, set **autoSelfTest = ON**, press Play
+> → console should show the Practice run, then `[APLab] Quiz round complete — 5/5`, then a **non-zero quiz%** in
+> the RESULTS line (was quiz 0%). (d) **Build to Quest** (plain Build; launch-while-worn; adb sideload) → poke
+> the bones AND answer the quiz. Report poke feel + quiz-panel placement/legibility/reach.
+> **Tune/cleanup:** the `Quiz Panel` transform (~[0,1.15,0.12], facing the user) is a first guess — nudge it
+> live in the Editor; commit `QuizPanelBuilder.cs.meta` once Unity generates it (focus Unity). **Still pending:**
+> Learn-intro UI (priority #3), result-sync to `vr-sync-result` (deferred — auth is publish-time).
 
 > **▶️ RESUME NEXT (marathon #5, 2026-06-13 — STABLE on Quest; poke mechanic WORKS ✅):** On-device confirmed:
 > **skull is stable in passthrough** (no fly-up), sits at a comfortable seated distance, **14 labeled bone dots**,
@@ -366,8 +394,11 @@ don't fan out parallel agents onto it). Claude can't see headset output — the 
    fallback), and `ModuleHost` (orchestrator that drives `ModuleRunner` Learn→Practice→Assess→Results and
    scores each IdentifyPart step). The generator now also stamps a trigger-collider `BoneTarget` on every
    marker. Scene `Module_Skeletal` wired: **Module Host** (autoSelfTest verified practical=77% — 5/5 bones +
-   deferred PlaceInSocket) + **Poke Tip** under `RightHandAnchor`. *Remaining:* Learn-phase UI (slice 2) and
-   the quiz/Assess UI (slice 3); real headset poke-test; `PlaceInSocket` scoring.
+   deferred PlaceInSocket) + **Poke Tip** under `RightHandAnchor`. ✅ **Quiz/Assess UI (slice 3) built
+   (2026-06-15):** pokeable `QuizOption`/`QuizPanel` + menu *A&P Lab/Build Quiz Panel*; `ModuleHost.BeginAssess`
+   feeds `ModuleRunner.RecordQuiz` (was hard-coded 0/0). ✅ **Poke feel tuned (2026-06-15):** visible tip aligned
+   to its trigger + visible/forgiving markers. *Remaining:* Learn-phase UI (slice 2); on-device verify of the
+   poke + quiz; `PlaceInSocket` scoring.
 3. **Wire results** — `ModuleRunner` + `SessionTracker` + `SupabaseClient` → post a completed lab to
    **`vr-sync-result`** (writes `vr_lab_attempts`, upserts `section_progress`, logs `activity_log`). Add the
    device-code login UI.
