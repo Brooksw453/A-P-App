@@ -32,7 +32,11 @@ public static class SkeletalLabelGenerator
     const string RootName = "Skeletal Labels";
     const string ContentPath = "APLab/Content/skeletal-system.json"; // under Assets/
     const float FontSize = 0.16f;         // TMP world font size (tweak + re-run if needed)
-    const float MarkerSize = 0.006f;
+    // Marker sizing in world metres. The VISIBLE sphere is what the learner aims at;
+    // the HIT sphere is a slightly larger, forgiving trigger co-located with it (no more
+    // tiny dot floating in a huge invisible hit zone). Tune these two + re-run the menu item.
+    const float MarkerVisualDiameter = 0.030f; // ~3 cm glowing target you can actually see
+    const float MarkerHitDiameter    = 0.042f; // ~4.2 cm forgiving poke zone (was ~3.6 cm)
     const float LineWidth = 0.0012f;
 
     // --- JSON shapes (JsonUtility ignores the fields we don't declare) ---
@@ -113,11 +117,13 @@ public static class SkeletalLabelGenerator
             marker.name = "Marker";
             marker.transform.SetParent(group.transform, true);
             marker.transform.position = p.point;
-            marker.transform.localScale = Vector3.one * MarkerSize;
-            // keep the sphere collider as an enlarged trigger so it's an easy poke target
+            marker.transform.localScale = Vector3.one * MarkerVisualDiameter;
+            // Trigger = a slightly larger forgiveness zone, centred on the visible sphere.
+            // radius is in LOCAL units: worldHitRadius = radius * localScale, so
+            // radius = (hitDiameter/2) / visualDiameter keeps the world size exact.
             var col = marker.GetComponent<SphereCollider>();
             col.isTrigger = true;
-            col.radius = 3f; // local units → ~0.018 m world (visual marker is smaller)
+            col.radius = (MarkerHitDiameter * 0.5f) / MarkerVisualDiameter;
             if (unlit != null)
                 marker.GetComponent<MeshRenderer>().sharedMaterial =
                     new Material(unlit) { color = new Color(1f, 0.85f, 0.3f) };

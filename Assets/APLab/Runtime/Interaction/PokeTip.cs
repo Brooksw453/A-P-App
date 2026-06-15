@@ -17,20 +17,62 @@ namespace APLab.View
     [RequireComponent(typeof(Rigidbody))]
     public class PokeTip : MonoBehaviour
     {
+        [Header("Tip placement")]
+        [Tooltip("Local position of the poke point on the hand/controller anchor. The trigger " +
+                 "sphere (and the visible tip, if assigned) are placed here so they line up — " +
+                 "fixes the 'visible ball isn't where the trigger is' mismatch.")]
+        public Vector3 tipCenter = new Vector3(0f, 0f, 0.12f);
+
+        [Tooltip("World radius of the poke trigger sphere. Match it to the visible tip ball.")]
+        public float tipRadius = 0.02f;
+
+        [Tooltip("Optional: the visible tip mesh (a child sphere). Snapped onto the trigger so " +
+                 "what you see is exactly what pokes.")]
+        public Transform visibleTip;
+
+        [Header("Behaviour")]
         [Tooltip("Re-arm delay so one touch fires once.")]
         public float debounce = 0.3f;
         float _nextAllowed;
 
-        void Reset()    => Configure();
-        void Awake()    => Configure();
+        void Reset()  => Configure();
+        void Awake()  => Configure();
 
+        // Click this in the inspector (component gear menu) to re-align the tip while tuning.
+        [ContextMenu("Align tip (collider + visible marker)")]
         void Configure()
         {
             var rb = GetComponent<Rigidbody>();
-            rb.isKinematic = true;
-            rb.useGravity = false;
+            if (rb != null) { rb.isKinematic = true; rb.useGravity = false; }
+
+            // Place + size the trigger on an EXISTING SphereCollider. We never create a
+            // collider at runtime under the XR rig — that caused the tracking-origin drift
+            // ("skull flies up"). Add the SphereCollider in the editor; this keeps it aligned.
+            var sphere = GetComponent<SphereCollider>();
+            if (sphere != null)
+            {
+                sphere.isTrigger = true;
+                sphere.center = tipCenter;
+                float s = Mathf.Max(0.0001f, MaxAbs(transform.lossyScale));
+                sphere.radius = tipRadius / s;   // keep world radius == tipRadius under any anchor scale
+            }
             foreach (var col in GetComponents<Collider>()) col.isTrigger = true;
+
+            // Auto-locate the visible tip if it wasn't wired in the inspector: the only
+            // child mesh under a Poke Tip is the static marker sphere. Finding an existing
+            // child is runtime-safe — no object/collider creation under the XR rig.
+            if (visibleTip == null)
+            {
+                var mr = GetComponentInChildren<MeshRenderer>();
+                if (mr != null && mr.transform != transform) visibleTip = mr.transform;
+            }
+
+            // Co-locate the visible ball with the trigger (it's a child of this object).
+            if (visibleTip != null) visibleTip.localPosition = tipCenter;
         }
+
+        static float MaxAbs(Vector3 v) =>
+            Mathf.Max(Mathf.Abs(v.x), Mathf.Max(Mathf.Abs(v.y), Mathf.Abs(v.z)));
 
         void OnTriggerEnter(Collider other)
         {
