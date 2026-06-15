@@ -8,7 +8,41 @@ Keep it updated as the project evolves.
 
 ## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-15)
 
-> **▶️ RESUME NEXT (session 2026-06-15 — poke-feel fix + in-headset QUIZ built; needs on-device verify):**
+> **▶️ RESUME NEXT (session 2026-06-15 — CORE EXPERIENCE VERIFIED ON-DEVICE ✅; NEXT = exploding skull + fix
+> touchpoints/labels):** The whole **Learn→Practice→Assess→Results** loop runs on the Quest with a **real manual
+> playthrough** (autoSelfTest OFF): clean boot (no `level0`), poke-to-identify with an on-screen instruction
+> banner, an in-headset multiple-choice quiz at the skull's spot, and real scoring → mastery. Manual run logged
+> `practical 15% · quiz 40% · mastery 25%` (low because of the dot issues below — not a bug). Commits on
+> `meta-xr-migration`: **`cfa5716d`** poke feel · **`e1bf6ae2`** quiz slice · **`70d8d570`** bigger panel + hide
+> labels · **`0843726b`** co-locate panel w/ skull + hide skull + practice banner · **`ee562c94`** + **`be170c16`**
+> enlarge the quiz question/banner text (raised the autosize floor so long questions don't shrink). *(Scene
+> `Module_Skeletal.unity` committed with the final panel/banner + autoSelfTest OFF.)*
+>
+> **⚠️ QUICK TODO (unverified):** Brooks reported the quiz QUESTION text still read small on-device; the
+> `be170c16` floor fix (question `fontSizeMin`=0.105 in a 0.94×0.48 box, panel ~1.0×1.12 m) was committed
+> WITHOUT a retest. **First thing on the next build: confirm the question + banner text size** and dial it in —
+> `QuizPanelBuilder` question `fontSizeMin`/box up if still small, or shrink the panel if it's now too big.
+>
+> **How it works now (runtime):** `ModuleHost` auto-finds `Skull` + `Skeletal Labels` + the quiz panel/banner by
+> name. **Practice:** the instruction banner floats above the skull showing the step prompt; all bones armed;
+> poke → green/red flash → advance. **Assess:** hides the skull AND labels, moves the **Quiz Panel** to the
+> skull's x/z (comfortable depth), runs the quiz → `RecordQuiz`; restores skull+labels at Results. `autoSelfTest`
+> auto-pokes + auto-answers the whole flow. **Menus:** *A&P Lab/Generate Skeletal Labels* (markers) · *A&P Lab/
+> Build Quiz Panel* (builds Quiz Panel + Instruction Banner, wires `ModuleHost`). New runtime `QuizOption`/
+> `QuizPanel` (`Runtime/View/`); editor `QuizPanelBuilder`.
+>
+> **▶️ NEXT FOCUS (Brooks's call) = (1) EXPLODING SKULL, then (2) fix touchpoints/labels.** The manual test
+> surfaced: dots are **clustered/misaligned** so the forgiving ~4.2 cm hit zones **overlap** (a poke catches a
+> neighbor — repeatedly hit Mandible when aiming elsewhere); **can't tell which dot is which**; and **occipital
+> (back) / sphenoid (internal) aren't reachable** on a solid skull. The exploding skull (dedicated
+> `visible-interactive-human-exploding-skull/` asset in the parent folder) fixes all three at once — de-clusters
+> + exposes the internal/posterior bones — and enables the **place-the-mandible-in-socket** step (which is why
+> practical caps at ~77%: the deferred `PlaceInSocket` step scores 0). Do the explode FIRST, then a label/
+> touchpoint alignment pass on the *separated* bones (aligning dots on the solid skull would be throwaway). Also
+> nudge `PokeTip.tipCenter` a little — Brooks felt the touchpoint was slightly off. **Still pending:** Learn-intro
+> UI (priority #3); result-sync to `vr-sync-result` (deferred — auth is publish-time).
+
+> **▶️ RESUME NEXT (session 2026-06-15, earlier — build steps, now done):**
 > Priorities #1 and #2 advanced and **committed on `meta-xr-migration`** — **`cfa5716d`** (poke feel) +
 > **`e1bf6ae2`** (quiz slice). **Pending = Brooks runs Unity once + builds to Quest.** Code-only this session
 > (no bridge needed); Unity was open, scripts importing.
