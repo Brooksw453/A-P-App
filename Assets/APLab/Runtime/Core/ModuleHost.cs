@@ -49,6 +49,7 @@ namespace APLab.View
         ModuleRunner _runner;
         ModuleDefinition _def;
         readonly Dictionary<string, BoneTarget> _targets = new Dictionary<string, BoneTarget>();
+        readonly List<BoneTarget> _all = new List<BoneTarget>();   // every target (both L/R) — used for arming
         int _stepIndex;
         int _attempts;
 
@@ -91,6 +92,7 @@ namespace APLab.View
         void GatherTargets()
         {
             _targets.Clear();
+            _all.Clear();
             if (labelsRoot == null)
             {
                 var go = GameObject.Find("Skeletal Labels");
@@ -103,7 +105,8 @@ namespace APLab.View
                 t.SetArmed(false);
                 t.Selected -= OnTargetSelected;
                 t.Selected += OnTargetSelected;
-                if (!string.IsNullOrEmpty(t.anchorName)) _targets[t.anchorName] = t;
+                _all.Add(t);                                       // arm every bone, both sides
+                if (!string.IsNullOrEmpty(t.anchorName)) _targets[t.anchorName] = t;  // one-per-anchor for auto-test lookup
             }
         }
 
@@ -178,8 +181,8 @@ namespace APLab.View
             Debug.Log($"[APLab] Practice {i + 1}/{steps.Count}: \"{step.instruction}\"  (answer: {step.correctKey})");
             ShowInstruction($"Practice  {i + 1} / {steps.Count}\n{step.instruction}");
 
-            // Whole skull is the field — arm every bone; only the right one scores.
-            foreach (var t in _targets.Values) t.SetArmed(true);
+            // Whole skull is the field — arm every bone (both L/R); only the right one scores.
+            foreach (var t in _all) t.SetArmed(true);
 
             if (autoSelfTest) StartCoroutine(AutoPick(step.correctKey));
         }
@@ -228,14 +231,14 @@ namespace APLab.View
 
         void DisarmAll()
         {
-            foreach (var t in _targets.Values) t.SetArmed(false);
+            foreach (var t in _all) t.SetArmed(false);
         }
 
         void ShowInstruction(string text)
         {
             if (instructionText == null) return;
             if (modelRoot != null)
-                instructionText.transform.position = modelRoot.position + new Vector3(0f, 0.5f, 0f);
+                instructionText.transform.position = modelRoot.position + new Vector3(0f, -0.40f, -0.20f);
             instructionText.gameObject.SetActive(true);
             instructionText.text = text;
             instructionText.ForceMeshUpdate();

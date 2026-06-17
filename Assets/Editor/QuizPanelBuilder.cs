@@ -50,22 +50,22 @@ public static class QuizPanelBuilder
         root.transform.rotation = Quaternion.identity;   // readable face toward the -Z user
 
         // Backboard (non-pokeable). Sits behind everything (+Z, away from the user).
-        MakeQuad("Board", root.transform, new Vector3(0f, -0.03f, 0.02f),
-            new Vector2(PanelWidth + 0.04f, 1.12f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
+        MakeQuad("Board", root.transform, new Vector3(0f, -0.10f, 0.02f),
+            new Vector2(PanelWidth + 0.04f, 1.40f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
 
         // Progress readout (top).
-        var ptmp = MakeText("Progress", root.transform, new Vector3(0f, 0.50f, 0f),
-            new Vector2(PanelWidth - 0.12f, 0.05f), 0.05f, TextAlignmentOptions.Center, font);
+        var ptmp = MakeText("Progress", root.transform, new Vector3(0f, 0.58f, 0f),
+            new Vector2(PanelWidth - 0.12f, 0.06f), 0.06f, TextAlignmentOptions.Center, font);
         ptmp.color = new Color(0.70f, 0.78f, 0.92f);
         ptmp.text = "Question 1 / 5";
         ptmp.ForceMeshUpdate();
 
         // Question prompt — big box AND a high autosize floor so long questions stay
         // readable (>= the answer-text size) instead of being shrunk tiny.
-        var qtmp = MakeText("Question", root.transform, new Vector3(0f, 0.23f, 0f),
-            new Vector2(PanelWidth - 0.06f, 0.48f), 0.15f, TextAlignmentOptions.Center, font);
-        qtmp.fontSizeMin = 0.105f;   // floor: never smaller than the answers read at
-        qtmp.fontSizeMax = 0.15f;
+        var qtmp = MakeText("Question", root.transform, new Vector3(0f, 0.26f, 0f),
+            new Vector2(PanelWidth - 0.06f, 0.55f), 0.20f, TextAlignmentOptions.Center, font);
+        qtmp.fontSizeMin = 0.14f;    // higher legibility floor (bumped 2026-06-17)
+        qtmp.fontSizeMax = 0.20f;
         qtmp.text = "The question prompt appears here.";
         qtmp.ForceMeshUpdate();
 
@@ -75,7 +75,7 @@ public static class QuizPanelBuilder
         panel.options = new List<QuizOption>();
 
         // Answer buttons, stacked below the question.
-        const float btnW = 0.90f, btnH = 0.11f, gap = 0.022f, top = -0.06f;
+        const float btnW = 0.90f, btnH = 0.13f, gap = 0.024f, top = -0.12f;
         for (int i = 0; i < OptionSlots; i++)
         {
             float y = top - i * (btnH + gap);
@@ -92,7 +92,7 @@ public static class QuizPanelBuilder
                 new Vector2(btnW, btnH), new Color(0.16f, 0.18f, 0.24f, 1f), unlit);
 
             var otmp = MakeText("Label", btn.transform, new Vector3(0f, 0f, 0f),
-                new Vector2(btnW - 0.03f, btnH), 0.12f, TextAlignmentOptions.Center, font);
+                new Vector2(btnW - 0.03f, btnH), 0.15f, TextAlignmentOptions.Center, font);
             otmp.text = $"Answer option {i + 1}";
             otmp.ForceMeshUpdate();
 
@@ -107,13 +107,13 @@ public static class QuizPanelBuilder
         // Practice-phase instruction banner (a separate root object). ModuleHost shows it
         // during Practice, repositions it above the skull, and hides it for the quiz.
         var banner = MakeText(BannerName, null, new Vector3(0f, 1.5f, 0.45f),
-            new Vector2(1.14f, 0.42f), 0.13f, TextAlignmentOptions.Center, font);
-        banner.fontSizeMin = 0.085f;   // same legibility floor for the instruction
-        banner.fontSizeMax = 0.13f;
+            new Vector2(1.30f, 0.46f), 0.18f, TextAlignmentOptions.Center, font);
+        banner.fontSizeMin = 0.12f;    // bigger instruction text (bumped 2026-06-17)
+        banner.fontSizeMax = 0.18f;
         banner.text = "Instruction appears here.";
         banner.ForceMeshUpdate();
         MakeQuad("Board", banner.transform, new Vector3(0f, 0f, 0.012f),
-            new Vector2(1.18f, 0.45f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
+            new Vector2(1.34f, 0.50f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
 
         // Wire the panel + banner into the ModuleHost so the phases find them.
         var host = Object.FindFirstObjectByType<ModuleHost>(FindObjectsInactive.Include);

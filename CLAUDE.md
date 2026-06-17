@@ -6,7 +6,42 @@ Keep it updated as the project evolves.
 
 ---
 
-## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-15)
+## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-17)
+
+> **▶️ RESUME NEXT (session 2026-06-17 — EXPLODING SKULL + HAND-RAY BUILT & VERIFIED ON-DEVICE ✅):** The
+> interactive exploding skull is live on the Quest. Built this session, all as one-click `A&P Lab/` menu
+> commands: **Setup Exploding Skull** (instantiates `Assets/Explode 2.fbx`, pivot-fixed, ~2× size, maps all 14
+> JSON anchors onto the real bone meshes as pokeable `BoneTarget`s in *mesh mode*); **Decimate Skull**
+> (UnityMeshSimplifier @ quality 0.30: ~1.13M→~340k tris + shadow-casting off — this **FIXED the framerate/
+> glitching**; the raw geomagic scan meshes were the cause); **Build Explode Slider** (`PokeSlider` →
+> `SkullExploder` 0..1 factor, user opens/closes the skull); **Build Hand Ray** (`HandRaySelector`: OVRHand
+> pointer-pose + pinch → raycast → our `IPokeReceiver.OnPoke()`, reuses every target, no Meta interactables).
+> Also fixed the **right-side touchpoint bug** (`ModuleHost` now arms ALL targets, not one-per-anchor).
+> **Hand-tracking enabled** (manifest feature+permission; the Meta **Hand Tracking building block** is in the
+> scene). **metavr / `meta-horizon-mcp` MCP installed** — Claude drives install/launch/logcat/**screenshot**/
+> perf (see §6.5). Direction confirmed: **hands not controllers; the ray is the primary input now.**
+>
+> **Verified on Quest:** exploded skull smooth + stable (no glitching), ~2× size out of the lap, **hand-ray
+> selects bones + quiz very well**, slider drags via pinch-hold, both-side bones register.
+>
+> **▶️ OPEN — Brooks's feedback for NEXT TIME (priority order):**
+> 1. **Hover feedback is missing** — bones + quiz do NOT turn cyan on ray hover; nothing shows where the ray is
+>    pointing (the cursor dot alone wasn't noticeable enough). `BoneTarget.SetHover` (MPB `_BaseColor`) likely
+>    isn't rendering on the skull material; `QuizOption` has no hover at all. Add clear hover highlight to both.
+> 2. **Rotate the skull** — "critical in the future." Add a dedicated rotate control (turntable: spin + tilt,
+>    like the explode slider) so it doesn't conflict with ray/poke bone-ID.
+> 3. **Instruction banner placement** — currently lands in the MIDDLE of the exploded skull; move it **above and
+>    slightly behind** the skull. It's positioned in `ModuleHost.ShowInstruction` (offset off `modelRoot`).
+> 4. **Text still too small** — quiz question + instruction banner; bump further (with ray, the banner can also
+>    move closer to the user since reach no longer matters).
+> 5. Tuning knobs if needed: `HandRaySelector.pinchOn/pinchOff` (0.75/0.4), `ExplodingSkullSetup.SkullPos`
+>    (0,1.30,1.15), banner offset, `SkullExploder.spread` (2).
+>
+> **Rebuild-the-scene run order** (after script edits): *Setup Exploding Skull → Decimate Skull → Build Explode
+> Slider → Build Hand Ray* (+ *Build Quiz Panel* only if the quiz changes). Verify `OVRManager` Hand Tracking
+> Support = "Controllers and Hands". New files: `Runtime/View/{SkullExploder,PokeSlider,HandRaySelector}.cs`;
+> `Editor/{ExplodingSkullSetup,SkullDecimator,ExplodeSliderBuilder,HandRayBuilder,ExplodingSkullInspector}.cs`;
+> decimated meshes under `Assets/APLab/Generated/SkullDecimated/`. Auth still deferred (publish-time).
 
 > **▶️ RESUME NEXT (session 2026-06-15 — CORE EXPERIENCE VERIFIED ON-DEVICE ✅; NEXT = exploding skull + fix
 > touchpoints/labels):** The whole **Learn→Practice→Assess→Results** loop runs on the Quest with a **real manual
@@ -330,7 +365,29 @@ package `mcpforunityserver`). **Architecture: ONE HTTP server on `127.0.0.1:8080
 
 **How we drive Unity:** `manage_scene`, `manage_gameobject`, `manage_components`, `manage_asset`,
 `read_console`, `manage_camera` (screenshots), `execute_menu_item`. Build **sequentially** (one live bridge —
-don't fan out parallel agents onto it). Claude can't see headset output — the user builds to Quest to verify.
+don't fan out parallel agents onto it). The user builds the APK; Claude can now sideload + read logcat + **see
+on-device output via metavr's `take_screenshot`** (§6.5).
+
+---
+
+## 6.5 ⚙️ Meta VR CLI (`metavr` / `hzdb`) — on-device dev tools (added 2026-06-17, verified)
+
+Meta's agentic Quest dev CLI, exposed to Claude as the **`meta-horizon-mcp`** MCP server. **SEPARATE from the
+Unity bridge** (Unity bridge = author the scene; metavr = device / build / verify / docs / perf — the other
+half of the loop). With a Quest on USB it lets Claude drive the headset directly: `hzdb_device`
+(list/connect/reboot), `hzdb_app` (install/launch/stop APKs), `get_device_logcat`, **`take_screenshot`**
+(Claude can finally SEE on-device output), Perfetto capture/analyze, and `meta_docs_search` for Quest docs.
+
+**Install (persists in user config):**
+`& "C:\Users\brook\.local\bin\claude.exe" mcp add meta-horizon-mcp -s user -- npx -y metavr mcp server`
+— ⚠️ the documented `npx -y metavr mcp install claude-code` auto-installer **silently no-ops here because
+`claude` isn't on PATH**; register the server directly with the full `claude.exe` path instead. Node ≥18
+required (have v24). The 27 agent "skills" are the `/plugin` route (interactive panel, client-dependent) — we
+installed the **MCP server only** (the functional half). Verify: `claude mcp list` →
+`meta-horizon-mcp … ✓ Connected`; a Claude restart loads the tools into the session.
+
+**Use:** plug the Quest in over USB (accept the in-headset USB-debugging prompt), then Claude sideloads +
+launches + screenshots + reads logcat with no manual adb. Still launch while worn/awake (§0 origin/ANR gotcha).
 
 ---
 

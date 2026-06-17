@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main",
+    "com.whinarn.unitymeshsimplifier": "https://github.com/Whinarn/UnityMeshSimplifier.git",
     "com.meta.xr.sdk.all": "85.0.0",
     "com.unity.ai.navigation": "2.0.10",
     "com.unity.animation.rigging": "1.4.1",
