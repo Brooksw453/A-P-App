@@ -62,10 +62,10 @@ public static class QuizPanelBuilder
 
         // Question prompt — big box AND a high autosize floor so long questions stay
         // readable (>= the answer-text size) instead of being shrunk tiny.
-        var qtmp = MakeText("Question", root.transform, new Vector3(0f, 0.26f, 0f),
-            new Vector2(PanelWidth - 0.06f, 0.55f), 0.20f, TextAlignmentOptions.Center, font);
-        qtmp.fontSizeMin = 0.14f;    // higher legibility floor (bumped 2026-06-17)
-        qtmp.fontSizeMax = 0.20f;
+        var qtmp = MakeText("Question", root.transform, new Vector3(0f, 0.27f, 0f),
+            new Vector2(PanelWidth - 0.06f, 0.60f), 0.26f, TextAlignmentOptions.Center, font);
+        qtmp.fontSizeMin = 0.185f;   // bigger again — pass 2 (2026-06-19)
+        qtmp.fontSizeMax = 0.26f;
         qtmp.text = "The question prompt appears here.";
         qtmp.ForceMeshUpdate();
 
@@ -107,13 +107,13 @@ public static class QuizPanelBuilder
         // Practice-phase instruction banner (a separate root object). ModuleHost shows it
         // during Practice, repositions it above the skull, and hides it for the quiz.
         var banner = MakeText(BannerName, null, new Vector3(0f, 1.5f, 0.45f),
-            new Vector2(1.30f, 0.46f), 0.18f, TextAlignmentOptions.Center, font);
-        banner.fontSizeMin = 0.12f;    // bigger instruction text (bumped 2026-06-17)
-        banner.fontSizeMax = 0.18f;
+            new Vector2(2.10f, 0.66f), 0.30f, TextAlignmentOptions.Center, font);
+        banner.fontSizeMin = 0.20f;    // bigger again — pass 2 (2026-06-19)
+        banner.fontSizeMax = 0.30f;
         banner.text = "Instruction appears here.";
         banner.ForceMeshUpdate();
         MakeQuad("Board", banner.transform, new Vector3(0f, 0f, 0.012f),
-            new Vector2(1.34f, 0.50f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
+            new Vector2(2.14f, 0.72f), new Color(0.06f, 0.07f, 0.10f, 1f), unlit);
 
         // Wire the panel + banner into the ModuleHost so the phases find them.
         var host = Object.FindFirstObjectByType<ModuleHost>(FindObjectsInactive.Include);

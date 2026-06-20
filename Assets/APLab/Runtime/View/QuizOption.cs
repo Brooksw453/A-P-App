@@ -12,7 +12,7 @@ using UnityEngine;
 namespace APLab.View
 {
     [RequireComponent(typeof(Collider))]
-    public class QuizOption : MonoBehaviour, IPokeReceiver
+    public class QuizOption : MonoBehaviour, IPokeReceiver, IRayHoverable
     {
         [Tooltip("Which answer option this is (index into the question's answerOptions).")]
         public int index;
@@ -33,8 +33,12 @@ namespace APLab.View
         static readonly Color Armed_ = new Color(0.20f, 0.34f, 0.52f, 1f);
         static readonly Color Right   = new Color(0.22f, 0.55f, 0.30f, 1f);
         static readonly Color Wrong   = new Color(0.60f, 0.22f, 0.20f, 1f);
+        static readonly Color HoverC  = new Color(0.34f, 0.62f, 0.92f, 1f);  // ray hover (brighter than armed)
 
         Coroutine _flash;
+        MaterialPropertyBlock _mpb;
+        static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        static readonly int ColorId = Shader.PropertyToID("_Color");
 
         void Awake()
         {
@@ -46,6 +50,24 @@ namespace APLab.View
         {
             Armed = on;
             if (_flash == null) ApplyColor(on ? Armed_ : Dim);
+        }
+
+        /// <summary>Ray-hover highlight. Per-renderer (MaterialPropertyBlock) so it only tints THIS
+        /// option; clearing it reverts to the current armed/dim color. Ignored mid-flash.</summary>
+        public void SetHover(bool on)
+        {
+            if (_flash != null) return;
+            if (background == null) background = GetComponent<Renderer>();
+            if (background == null) return;
+            if (on)
+            {
+                _mpb ??= new MaterialPropertyBlock();
+                background.GetPropertyBlock(_mpb);
+                _mpb.SetColor(BaseColorId, HoverC);
+                _mpb.SetColor(ColorId, HoverC);
+                background.SetPropertyBlock(_mpb);
+            }
+            else background.SetPropertyBlock(null);
         }
 
         /// <summary>Invoked by any input source (poke tip, ray, mouse).</summary>
@@ -65,6 +87,7 @@ namespace APLab.View
 
         void Flash(Color c)
         {
+            if (background != null) background.SetPropertyBlock(null);   // drop any hover tint so the flash shows
             if (!isActiveAndEnabled) { ApplyColor(c); return; }
             if (_flash != null) StopCoroutine(_flash);
             _flash = StartCoroutine(FlashRoutine(c));

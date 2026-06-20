@@ -45,6 +45,9 @@ namespace APLab.View
         public Transform modelRoot;
         [Tooltip("Practice-phase instruction banner (built by A&P Lab/Build Quiz Panel).")]
         public TextMeshPro instructionText;
+        [Tooltip("Banner offset from the skull root: +Y is above, +Z is behind (away from the user). " +
+                 "Sits above-and-behind so it clears the exploded skull — tune live in the inspector.")]
+        public Vector3 bannerOffset = new Vector3(0f, 0.65f, 0.20f);
 
         ModuleRunner _runner;
         ModuleDefinition _def;
@@ -238,7 +241,7 @@ namespace APLab.View
         {
             if (instructionText == null) return;
             if (modelRoot != null)
-                instructionText.transform.position = modelRoot.position + new Vector3(0f, -0.40f, -0.20f);
+                instructionText.transform.position = modelRoot.position + bannerOffset;
             instructionText.gameObject.SetActive(true);
             instructionText.text = text;
             instructionText.ForceMeshUpdate();

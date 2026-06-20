@@ -6,7 +6,59 @@ Keep it updated as the project evolves.
 
 ---
 
-## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-17)
+## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-19)
+
+> **▶️ RESUME NEXT (session 2026-06-19 — RAY-FEEDBACK + READABILITY PASS ✅ VERIFIED ON-DEVICE; NEXT = ROTATE + LABELS):**
+> Addressed 3 of Brooks's 2026-06-17 open items — the hover gap **#1** + banner placement **#3** + text size
+> **#4** — as code-only edits. **No scene rebuild needed EXCEPT re-run *A&P Lab/Build Quiz Panel*** (for the
+> bigger text); the hover/cursor/banner-offset changes take effect on recompile because they drive the EXISTING
+> scene objects.
+> - **(1) Hover feedback** — new `IRayHoverable` interface (`Runtime/Interaction/PokeTip.cs`). `HandRaySelector`
+>   now highlights **BOTH bones and quiz answers** (was `recv as BoneTarget`, so quiz answers never highlighted)
+>   AND drives a **state-aware cursor**: it grows (`cursorBaseSize 0.03`→`cursorHoverSize 0.052`) and turns green
+>   (`cursorHoverColor`) over any target — fixes "can't tell where the ray is pointing." `BoneTarget.SetHover`
+>   now **GLOWS via emission** (a plain `_BaseColor` tint just multiplied the bone albedo → muddy darkening, the
+>   "bones don't turn cyan" bug); it lazily instances each bone's own material to enable `_EMISSION` (shared
+>   skull material untouched). `QuizOption` got a per-option MaterialPropertyBlock hover (it had none).
+> - **(3) Banner** — `ModuleHost.ShowInstruction` offset flipped from below+in-front `(0,-0.40,-0.20)` to a new
+>   **inspector-tunable `bannerOffset = (0, 0.65, 0.20)`** = above + behind the skull.
+> - **(4) Text** — quiz question `0.14/0.20`→`0.16/0.23` (taller box), instruction banner `0.12/0.18`→`0.16/0.24`
+>   (wider box + board) in `QuizPanelBuilder`.
+>
+> **ON-DEVICE TEST 1 (2026-06-19):** ✅ banner now ABOVE the skull (was middle) · ✅ green state-aware cursor ·
+> ✅ LEFT ray glows bones + quiz cyan · ✅ text bigger (wanted bigger still). ❌ **RIGHT ray didn't glow** — root
+> cause: `HandRaySelector` had ONE shared `_hovered`, so the last-iterated hand overwrote it every frame and only
+> one ray ever glowed. **FIXED:** `_hovered` is now **per-hand** (`IRayHoverable[]`) with a guard so a target
+> stays lit while the OTHER hand is still on it (clear-on-untracked + clear-in-HideAll too). **Text pass 2:**
+> question →`0.185/0.26`, banner →`0.20/0.30` (box 2.1×0.66, board 2.14×0.72). Re-run *Build Quiz Panel* +
+> rebuild to verify BOTH rays glow + the bigger text. (Cursor/ray feedback is runtime — no menu re-run.)
+>
+> **ON-DEVICE TEST 2 (2026-06-19):** ✅ ALL VERIFIED — both L+R rays glow bones + quiz cyan, banner above the
+> skull, text bigger. Brooks: "Looks great." The ray-feedback + readability pass (#1, #3, #4) is DONE & committed
+> (`meta-xr-migration`). Steps below were the build loop used to get here (kept for reference).
+>
+> **▶️ STEPS (Brooks, ~10 min):** (a) focus Unity → recompile; tell Claude → Claude reads `Editor.log` for
+> `error CS`. (b) Run **A&P Lab/Build Quiz Panel** (rebuilds quiz + banner at the new sizes, re-wires ModuleHost),
+> then SAVE the scene. (c) On **Module Host**, confirm **bannerOffset = (0, 0.65, 0.20)** (if it deserialized to
+> 0,0,0, set it). (d) Build APK → sideload → test: bones + quiz answers **glow cyan on ray hover**, the **cursor
+> grows + turns green** over a target, the **banner sits above/behind** the exploded skull, and the **quiz
+> question + banner read bigger**. **Tuning knobs (inspector / one-click):** `HandRaySelector.cursorHoverSize/
+> Color`, `BoneTarget.EmissionBoost` (code, 1.4), `ModuleHost.bannerOffset`, `QuizPanelBuilder` font sizes
+> (re-run the menu after changing). **Files touched:** `Runtime/Interaction/PokeTip.cs`,
+> `Runtime/View/{HandRaySelector,BoneTarget,QuizOption}.cs`, `Runtime/Core/ModuleHost.cs`,
+> `Editor/QuizPanelBuilder.cs`.
+>
+> **▶️ NEXT (Brooks's call, picking up 2026-06-20):**
+> **(A) #2 Rotate the skull** (turntable spin+tilt — Brooks: "critical, need it to fully see the app"; est. ~2.5 h:
+> new `SkullRotator` runtime + `Build Rotate Control` menu mirroring the explode slider, + a HandRaySelector
+> input-mode so rotate-drag doesn't fight bone selection; bone colliders ride the skull root so they rotate
+> safely, and `SkullExploder` works in bone-local space so it's unaffected).
+> **(B) Bring the LABELS back** — they're NOT lost: `Editor/ExplodingSkullSetup.cs` *disables* the old
+> "Skeletal Labels" root (it was built for the solid `Skull`, which is also disabled). Re-add via menu
+> **A&P Lab/Generate Skeletal Labels** (`Editor/SkeletalLabelGenerator.cs`), but they'll need re-aligning to the
+> EXPLODED bone positions — this is the 2026-06-15 "re-align dots/labels on the separated bones" task. Pairs well
+> with the explode slider (labels could fade in as the skull opens).
+> **#5** misc tuning. Auth still deferred (publish-time).
 
 > **▶️ RESUME NEXT (session 2026-06-17 — EXPLODING SKULL + HAND-RAY BUILT & VERIFIED ON-DEVICE ✅):** The
 > interactive exploding skull is live on the Quest. Built this session, all as one-click `A&P Lab/` menu

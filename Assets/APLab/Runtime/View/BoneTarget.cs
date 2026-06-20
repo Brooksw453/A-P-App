@@ -13,7 +13,7 @@ using UnityEngine;
 namespace APLab.View
 {
     [RequireComponent(typeof(Collider))]
-    public class BoneTarget : MonoBehaviour, IPokeReceiver
+    public class BoneTarget : MonoBehaviour, IPokeReceiver, IRayHoverable
     {
         public string anchorName;
 
@@ -32,13 +32,16 @@ namespace APLab.View
         static readonly Color Armed_ = new Color(1f, 0.85f, 0.3f, 1f);
         static readonly Color Right  = new Color(0.35f, 1f, 0.45f, 1f);
         static readonly Color Wrong  = new Color(1f, 0.35f, 0.3f, 1f);
-        static readonly Color Hover  = new Color(0.45f, 0.85f, 1f, 1f);   // ray hover (mesh mode)
+        static readonly Color Hover  = new Color(0.55f, 0.9f, 1f, 1f);    // ray hover — glows via emission
 
         Renderer _renderer;
         Coroutine _flash;
         MaterialPropertyBlock _mpb;
+        bool _emissionReady;
+        const float EmissionBoost = 1.4f;
         static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         static readonly int ColorId = Shader.PropertyToID("_Color");
+        static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 
         void Awake()
         {
@@ -101,16 +104,35 @@ namespace APLab.View
         {
             if (_renderer == null) _renderer = GetComponent<Renderer>();
             if (_renderer == null) return;
+            EnsureEmission();
             _mpb ??= new MaterialPropertyBlock();
             _renderer.GetPropertyBlock(_mpb);
             _mpb.SetColor(BaseColorId, c);
             _mpb.SetColor(ColorId, c);
+            _mpb.SetColor(EmissionColorId, c * EmissionBoost);   // GLOW so the tint reads on the lit bone
             _renderer.SetPropertyBlock(_mpb);
         }
 
         void ClearBlock()
         {
-            if (_renderer != null) _renderer.SetPropertyBlock(null);
+            if (_renderer != null) _renderer.SetPropertyBlock(null);   // back to natural (emission black)
+        }
+
+        // A plain _BaseColor tint just MULTIPLIES the bone's albedo texture, so cyan came out as a
+        // muddy darkening that didn't read (the "bones don't turn cyan on hover" bug). Enabling
+        // emission lets the hover / correct / wrong colors actually glow. We instance only THIS bone's
+        // material (the shared skull material is untouched) and leave emission black at rest — the MPB
+        // drives the glow. Harmless if the shader has no _EMISSION keyword. Lazy, on first highlight.
+        void EnsureEmission()
+        {
+            if (_emissionReady) return;
+            _emissionReady = true;
+            if (_renderer == null) _renderer = GetComponent<Renderer>();
+            if (_renderer == null) return;
+            var mat = _renderer.material;                 // per-renderer instance
+            mat.EnableKeyword("_EMISSION");
+            mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+            mat.SetColor(EmissionColorId, Color.black);
         }
 
         void ApplyColor(Color c)

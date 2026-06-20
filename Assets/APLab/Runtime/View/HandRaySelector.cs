@@ -30,10 +30,22 @@ namespace APLab.View
         [Tooltip("Pinch strength to RELEASE (lower than pinchOn = hysteresis, kills flicker).")]
         public float pinchOff = 0.4f;
 
+        [Header("Cursor feedback (where the ray is pointing)")]
+        [Tooltip("Cursor size when NOT over a selectable target.")]
+        public float cursorBaseSize = 0.03f;
+        [Tooltip("Cursor size when OVER a bone / quiz answer / slider (grows = obvious).")]
+        public float cursorHoverSize = 0.052f;
+        public Color cursorBaseColor = new Color(0.55f, 0.85f, 1f, 1f);
+        [Tooltip("Cursor + ray colour when over a selectable target.")]
+        public Color cursorHoverColor = new Color(0.40f, 1f, 0.55f, 1f);
+
         OVRHand[] _hands;
         bool[] _pinching;
         readonly RaycastHit[] _hits = new RaycastHit[16];
-        BoneTarget _hovered;
+        IRayHoverable[] _hovered;   // per hand — both rays highlight independently
+        MaterialPropertyBlock _curMpb;
+        static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        static readonly int ColorId = Shader.PropertyToID("_Color");
 
         void Start() => FindHands();
 
@@ -41,6 +53,7 @@ namespace APLab.View
         {
             _hands = FindObjectsByType<OVRHand>(FindObjectsSortMode.None);
             _pinching = new bool[_hands.Length];
+            _hovered = new IRayHoverable[_hands.Length];
         }
 
         void Update()
@@ -59,7 +72,8 @@ namespace APLab.View
 
                 if (hand == null || !hand.IsTracked || !hand.IsPointerPoseValid)
                 {
-                    SetRay(line, cursor, false, Vector3.zero, Vector3.zero);
+                    Hover(h, null);                                 // drop this hand's highlight if it loses tracking
+                    SetRay(line, cursor, false, Vector3.zero, Vector3.zero, false);
                     continue;
                 }
 
@@ -94,48 +108,90 @@ namespace APLab.View
                     }
                 }
 
+                bool overTarget = false;
                 if (slider != null)
                 {
                     if (now) slider.DriveFromWorldPoint(point);     // pinch-hold drag
-                    Hover(null);
+                    Hover(h, null);
+                    overTarget = true;                              // the slider is a target too
                 }
                 else if (recv != null)
                 {
-                    Hover(recv as BoneTarget);
+                    Hover(h, recv as IRayHoverable);                // bones AND quiz answers highlight
                     if (pinchDown) recv.OnPoke();
+                    overTarget = true;
                 }
-                else Hover(null);
+                else Hover(h, null);
 
-                SetRay(line, cursor, true, origin, point);
+                SetRay(line, cursor, true, origin, point, overTarget);
             }
         }
 
-        void Hover(BoneTarget bt)
+        // Per-hand hover so BOTH rays highlight independently. (A single shared field let the
+        // last-iterated hand overwrite it every frame, so only one ray's target ever glowed —
+        // that was the "right ray doesn't highlight" bug.) When a hand leaves a target, only
+        // clear its glow if the OTHER hand isn't still pointing at it.
+        void Hover(int hand, IRayHoverable h)
         {
-            if (_hovered == bt) return;
-            if (_hovered != null) _hovered.SetHover(false);
-            _hovered = bt;
-            if (_hovered != null) _hovered.SetHover(true);
+            var prev = _hovered[hand];
+            if (ReferenceEquals(prev, h)) return;
+            _hovered[hand] = h;
+            if (prev != null && !StillHovered(prev, hand)) prev.SetHover(false);
+            if (h != null) h.SetHover(true);
         }
 
-        void SetRay(LineRenderer line, Transform cursor, bool on, Vector3 a, Vector3 b)
+        bool StillHovered(IRayHoverable t, int exceptHand)
         {
+            for (int i = 0; i < _hovered.Length; i++)
+                if (i != exceptHand && ReferenceEquals(_hovered[i], t)) return true;
+            return false;
+        }
+
+        void SetRay(LineRenderer line, Transform cursor, bool on, Vector3 a, Vector3 b, bool overTarget)
+        {
+            Color c = overTarget ? cursorHoverColor : cursorBaseColor;
             if (line != null)
             {
                 line.enabled = on;
-                if (on) { line.positionCount = 2; line.SetPosition(0, a); line.SetPosition(1, b); }
+                if (on)
+                {
+                    line.positionCount = 2; line.SetPosition(0, a); line.SetPosition(1, b);
+                    line.startColor = line.endColor = c;            // ray brightens on a target
+                }
             }
             if (cursor != null)
             {
                 cursor.gameObject.SetActive(on);
-                if (on) cursor.position = b;
+                if (on)
+                {
+                    cursor.position = b;
+                    cursor.localScale = Vector3.one * (overTarget ? cursorHoverSize : cursorBaseSize);
+                    ApplyCursorColor(cursor, c);                    // grows + recolours = obvious hover
+                }
             }
+        }
+
+        void ApplyCursorColor(Transform cursor, Color c)
+        {
+            var r = cursor.GetComponent<Renderer>();
+            if (r == null) return;
+            _curMpb ??= new MaterialPropertyBlock();
+            r.GetPropertyBlock(_curMpb);
+            _curMpb.SetColor(BaseColorId, c);
+            _curMpb.SetColor(ColorId, c);
+            r.SetPropertyBlock(_curMpb);
         }
 
         void HideAll()
         {
             if (rays != null) foreach (var l in rays) if (l != null) l.enabled = false;
             if (cursors != null) foreach (var c in cursors) if (c != null) c.gameObject.SetActive(false);
+            if (_hovered != null)
+                for (int i = 0; i < _hovered.Length; i++)
+                {
+                    if (_hovered[i] != null) _hovered[i].SetHover(false);
+                    _hovered[i] = null;
+                }
         }
     }
 }

@@ -14,6 +14,10 @@ namespace APLab.View
 {
     public interface IPokeReceiver { void OnPoke(); }
 
+    // Anything the hand-ray can HIGHLIGHT on hover (bones, quiz answers). Kept separate
+    // from IPokeReceiver so a target can be pokeable, hoverable, or both.
+    public interface IRayHoverable { void SetHover(bool on); }
+
     [RequireComponent(typeof(Rigidbody))]
     public class PokeTip : MonoBehaviour
     {
