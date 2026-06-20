@@ -20,7 +20,12 @@ public static class HandRayBuilder
         if (old != null) Undo.DestroyObjectImmediate(old);
 
         var unlit = Shader.Find("Universal Render Pipeline/Unlit");
-        var rayColor = new Color(0.40f, 0.80f, 1f, 0.9f);
+        // Rays use an ALWAYS-ON-TOP overlay shader so they're never hidden behind the skull /
+        // teeth (that was the "right ray invisible" bug — it was being occluded). Fall back to
+        // Unlit if the shader didn't import.
+        var rayShader = Shader.Find("APLab/RayOverlay");
+        if (rayShader == null) rayShader = unlit;
+        var rayColor = new Color(0.45f, 0.85f, 1f, 1f);
 
         var root = new GameObject(RootName);
         Undo.RegisterCreatedObjectUndo(root, "Build Hand Ray");
@@ -35,13 +40,13 @@ public static class HandRayBuilder
             var lr = lineGo.AddComponent<LineRenderer>();
             lr.useWorldSpace = true;
             lr.positionCount = 2;
-            lr.startWidth = 0.006f;
-            lr.endWidth = 0.004f;
+            lr.startWidth = 0.012f;
+            lr.endWidth = 0.008f;
             lr.numCapVertices = 2;
             lr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            if (unlit != null)
+            if (rayShader != null)
             {
-                lr.sharedMaterial = new Material(unlit) { color = rayColor };
+                lr.sharedMaterial = new Material(rayShader) { color = rayColor };
                 lr.startColor = lr.endColor = rayColor;
             }
             lr.enabled = false;

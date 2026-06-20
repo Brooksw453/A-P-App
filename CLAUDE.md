@@ -6,7 +6,163 @@ Keep it updated as the project evolves.
 
 ---
 
-## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-19)
+## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-20)
+
+> **▶️ RESUME NEXT (session 2026-06-20 #7 — LABELS ROTATE WITH THE SKULL; ⏳ NOT YET ON-DEVICE):**
+> On-device #6: declutter worked (labels spread + readable) ✅. But labels DIDN'T rotate with the skull — spinning
+> it left the labels in place and stretched the leader lines (their `outwardDir` was WORLD-space). Fix: store
+> `outwardDir` in the skull's LOCAL frame and rotate it by `skullCenter.rotation` each frame, so labels turn WITH
+> the skull and stay by their bones (the explosion radius already rides them in/out). Changed `LabelFollow` (rotate
+> the dir) + `BoneLabelBuilder` (store `Inverse(skull.rotation) * dir`). **STEPS:** recompile → **Build Bone
+> Labels** → SAVE → build → sideload. TEST: spin the skull — labels ride along, leader lines stay short.
+> **NEXT: the walk-around ORBIT.**
+
+> **▶️ RESUME NEXT (session 2026-06-20 #6 — LABEL DECLUTTER; ⏳ NOT YET ON-DEVICE):**
+> On-device #5: labels readable now (outline ✅), outside the skull ✅, leader lines ✅, rays visible ✅. One issue:
+> the forward-facing FACIAL bone labels OVERLAPPED (they share a ~forward direction). Brooks chose "declutter near
+> the bones." Added a **direction-relaxation declutter** in `BoneLabelBuilder` (`Spread()` — repels label
+> directions apart on the unit sphere, each clamped to ≤`MaxDriftDeg` 55° from its bone's true direction, so labels
+> fan out but stay near their bone; leader lines connect them). Only `BoneLabelBuilder` changed (`LabelFollow`
+> untouched). **STEPS:** recompile → **Build Bone Labels** → SAVE → build → sideload. TEST: facial-bone labels no
+> longer stack. Tune (re-run): `MinSeparationDeg` 16 / `MaxDriftDeg` 55 / `MinRadius` 0.5 / `FontSize` 0.16.
+> **NEXT: the walk-around ORBIT.**
+
+> **▶️ RESUME NEXT (session 2026-06-20 #5 — LABELS REWORKED: outside-skull + outline + leader lines; ⏳ NOT YET ON-DEVICE):**
+> On-device #4: rays fixed (visible) ✅, controls well-placed ✅, slider+bone label sizes better. Remaining (Brooks):
+> bone labels were BURIED inside the assembled skull (invisible) + still a bit small + hard to tie to a bone.
+> Reworked both label files (only **Build Bone Labels** re-run needed this cycle):
+> - **`LabelFollow`** now parks each label OUTSIDE the skull on a FIXED radial at `max(minRadius 0.45, boneDist +
+>   gap 0.12)` — readable assembled (just outside the compact skull) AND exploded (just beyond the bone) — and
+>   drives a **leader line** to the bone's visual centre that tracks it through the explode. Auto-hides with the bone.
+> - **`BoneLabelBuilder`** — font 0.14→**0.16**, **black outline** (on a COPY of the font material, so the slider/
+>   banner text is untouched), per-label always-on-top leader line (reuses `APLab/RayOverlay`), captures each
+>   bone's outward direction at build.
+> - Banner ("label/quiz") = Brooks live-tunes `ModuleHost.bannerOffset` (a bit further back +Z / down −Y).
+>
+> **▶️ STEPS (Brooks):** focus Unity → recompile; tell Claude → reads `Editor.log`. Then just **Build Bone Labels**
+> → SAVE → build APK → Claude sideloads. (Rays/sliders unchanged — no need to re-run those.) TEST: labels sit
+> OUTSIDE the skull (visible assembled AND exploded), readable with the outline, each with a line to its bone.
+> Tune: `BoneLabelBuilder.FontSize / MinRadius / Gap` (re-run) or per-label `LabelFollow.minRadius/gap` live.
+> Files: `Runtime/View/LabelFollow.cs`, `Editor/BoneLabelBuilder.cs`.
+>
+> **▶️ NEXT: the walk-around ORBIT** (still queued — controls follow the user, banner stays behind). Then
+> phase-gate labels (hide during Practice). Auth deferred (publish-time).
+
+> **▶️ RESUME NEXT (session 2026-06-20 #4 — READABILITY + RAY-VISIBILITY FIXES; ⏳ NOT YET ON-DEVICE):**
+> On-device #3: app clean, labels render + ride the explode ✅, BUT (Brooks): bone labels WAY too small to read;
+> slider labels too small; one ray (right) invisible though it still selects; sliders ended up IN the bones (he
+> moved them live to a better spot); and the controls/banner still don't orbit the user (= the deferred NEXT item).
+> This cycle, code-only:
+> - **Rays always-on-top** — new `Assets/APLab/Shaders/RayOverlay.shader` (unlit, ZTest Always, vertex-coloured);
+>   `HandRayBuilder` builds the ray LineRenderers with it + thicker (0.012/0.008). Fixes "right ray invisible" = it
+>   was being OCCLUDED by the skull/teeth. **Re-run Build Hand Ray.**
+> - **Bone labels bigger** — `BoneLabelBuilder.FontSize` 0.06 → **0.14**, white, bigger box. **Re-run Build Bone Labels.**
+> - **Slider labels bigger** — explode + rotate label font 0.085 → **0.13**. AND `ExplodeSliderBuilder` now
+>   **PRESERVES the existing 'Explode Slider' position** on re-run (reuses its transform if present) so the manual
+>   placement survives; rotate re-stacks under it. **Re-run Build Explode Slider → Build Rotate Control.**
+>
+> **▶️ STEPS (Brooks):** focus Unity → recompile (+ shader import); tell Claude → reads `Editor.log` (catches C#
+> AND shader errors). Then run: **Build Hand Ray → Build Explode Slider → Build Rotate Control → Build Bone
+> Labels** → SAVE → build APK → Claude sideloads. TEST: both rays visible; bone + slider labels readable; sliders
+> still where you put them. Tune: `BoneLabelBuilder.FontSize`, slider label fontSize, `LabelFollow.outward/up`.
+> Files: `Shaders/RayOverlay.shader` (new), `Editor/{HandRayBuilder,BoneLabelBuilder,ExplodeSliderBuilder,RotateControlBuilder}.cs`.
+>
+> **▶️ NEXT (the priority Brooks keeps asking for): the walk-around ORBIT** — a runtime lazy-follow rig so the
+> sliders stay between user↔skull and the banner stays behind as the user walks around (labels already billboard).
+> Retires the slider-placement tug-of-war. Then phase-gate labels (hide in Practice). Auth deferred (publish-time).
+
+> **▶️ RESUME NEXT (session 2026-06-20 #3 — GESTURES PARKED · LABELS BACK · LAYOUT TWEAKS; ⏳ NOT YET ON-DEVICE):**
+> On-device: sliders good (keep them stacked) but too LOW to grab comfortably seated; pinch-explode worked
+> intermittently, one-hand spin/rotate didn't (kept selecting armed bones — the arbitration-vs-always-armed
+> conflict I flagged). Brooks: park gestures, optimize layout, **bring the bone labels back**, and floated a
+> walk-around "controls always in front / question always behind / labels face the user" idea (= the NEXT step).
+> This cycle, code-only:
+> - **Gestures PARKED** — `HandRaySelector.enableGestures = false` (code kept; revisit only if bones become
+>   *selectively* armed so an empty-space pinch can be isolated from a bone pinch).
+> - **Bone labels back (NEW)** — `Editor/BoneLabelBuilder.cs` → menu **A&P Lab/Build Bone Labels**, + runtime
+>   `Runtime/View/LabelFollow.cs`. One billboarded TMP label per bone (term + pronunciation from
+>   `skeletal-system.json`) under a **world-scale "Bone Labels" root** (constant text size; NO collider, so it
+>   never blocks the ray). `LabelFollow` parks each label just outside its bone every frame → labels **ride the
+>   explode** + reassemble, and **auto-hide when the bone hides** (the quiz). Reuses `LabelBillboard` (faces user).
+>   ⚠️ Labels show in ALL phases right now — gating them OFF during Practice (keep it a real test) is a small
+>   follow-up tied to a Learn/Atlas mode.
+> - **Layout** — explode slider RAISED + pulled forward (`ExplodeSliderBuilder` offset −0.30/−0.12 → −0.18/−0.22);
+>   the rotate sliders auto-stack under it. Skull-closer + banner-back/lower are LIVE edits (below), NOT code,
+>   because re-running *Setup Exploding Skull* would revert to FULL-RES meshes (lose the decimation → framerate).
+>
+> **▶️ STEPS (Brooks), in order:** focus Unity → recompile (tell Claude → reads `Editor.log`). Then:
+> (1) **live-nudge** `Skull (Exploding)` Z closer (~1.15 → ~1.00) FIRST so the controls/labels build relative to
+> it — **do NOT re-run Setup Exploding Skull** (reverts to full-res meshes). (2) Run **Build Explode Slider** →
+> **Build Rotate Control** → **Build Bone Labels**. (3) On **Module Host**, set **bannerOffset** back + lower, e.g.
+> (0, 0.45, 0.40) (was 0,0.65,0.20). (4) SAVE → build APK → Claude sideloads. TEST: labels readable + riding the
+> explode + facing you; sliders comfortable seated; banner behind + lower; skull close but clear of the sliders.
+> Tune live: per-label `LabelFollow.outwardDistance/upDistance`, or `BoneLabelBuilder.FontSize` (re-run). Files:
+> `Runtime/View/{LabelFollow,HandRaySelector}.cs`, `Editor/{BoneLabelBuilder,ExplodeSliderBuilder}.cs`.
+>
+> **▶️ NEXT: the walk-around ORBIT** — runtime lazy-follow so the controls stay between user↔skull, the banner
+> stays behind, labels already face the user (positions UI relative to the USER → robustly fixes "too low / not in
+> front"). Then phase-gate the labels (hide during Practice). Auth still deferred (publish-time).
+
+> **▶️ RESUME NEXT (session 2026-06-20 cont. — SLIDERS VERIFIED ✅; HAND GESTURES + SLIDER REPOSITION BUILT, ⏳ NOT YET ON-DEVICE):**
+> On-device the spin/tilt sliders "work great… help a lot to give a full view of the skull." Brooks's one issue:
+> they sat right under the skull, so the EXPLODED bones blocked them. Fix + a new interaction he asked for — both
+> code-only:
+> - **Sliders repositioned** — `RotateControlBuilder` now anchors the spin/tilt sliders directly BENEATH the
+>   existing explode slider (it finds the `PokeSlider` with `drive==Exploder`), so all three form one reachable
+>   column pulled toward the user, out of the bone cloud. **Re-run A&P Lab/Build Rotate Control** to apply.
+> - **Hand gestures (new, additive in `HandRaySelector`)** — arbitration: a pinch on a slider or an ARMED target
+>   still selects/drags; a pinch on EMPTY SPACE (or an un-armed bone) is "free" and feeds a gesture layer.
+>   **One free hand = grab-to-rotate** (horizontal→spin, vertical→tilt via `SkullRotator.AddSpin/AddTilt`);
+>   **two free hands = pull-apart-to-explode / push-together-to-reassemble** (inter-hand distance →
+>   `SkullExploder.SetFactor`) — Brooks's idea (two-hand = explode, not scale). Tunables on the **Hand Ray**
+>   object: `enableGestures`, `spin/tilt/explodeSensitivity` (negative inverts a direction); auto-finds
+>   rotator/exploder. **NO new menu** — it's runtime on the existing Hand Ray object, live on recompile.
+> - **`PokeSlider` self-syncs now** (always-on Update) so a slider handle follows when a GESTURE drives the same
+>   target — sliders + gestures stay consistent.
+> - **Arbitration nuance:** during Practice ALL bones are armed, so to gesture you point at empty space beside the
+>   skull (not through the bones); the sliders stay the reliable in-practice control. Gestures shine in free-look.
+>
+> **▶️ STEPS (Brooks):** focus Unity → recompile (tell Claude → reads `Editor.log`) → **A&P Lab/Build Rotate
+> Control** → SAVE → build APK → Claude sideloads. TEST: (1) spin/tilt sliders now stack under the explode slider,
+> clear of the bones; (2) one-hand pinch on empty space + move L/R = spin, up/down = tilt; (3) two-hand pinch +
+> pull apart = explode, together = reassemble. Report feel; tune `spin/tilt/explodeSensitivity` (flip the sign if a
+> direction is backwards). Files: `Runtime/View/{HandRaySelector,SkullRotator,PokeSlider}.cs`,
+> `Editor/RotateControlBuilder.cs`. **NEXT after this verifies: #7 bring the labels back.**
+
+> **▶️ RESUME NEXT (session 2026-06-20 — ROTATE CONTROL (TURNTABLE) BUILT IN CODE; ⏳ NOT YET ON-DEVICE):**
+> Built the #2 "rotate the skull" feature Brooks flagged critical, as code-only edits + a one-click menu (the
+> same frictionless pattern as the explode slider). **A turntable: spin (yaw) + tilt (pitch) poke-sliders.**
+> - **`Runtime/View/SkullRotator.cs` (NEW)** — sits on the **skull ROOT** (`Skull (Exploding)`), so the whole
+>   hierarchy (every bone + its trigger collider + the SkullExploder offsets) turns rigidly as one. `spin`
+>   (−180..180 around world-up) + `tilt` (±80 around world-right) apply on top of a captured `homeRotation`, so
+>   spin=tilt=0 = the front-facing rest pose. **Explode is untouched** (SkullExploder works in each bone's
+>   parent-local `localPosition`, so rotating the root doesn't change locals), and the bone colliders ride along
+>   so ray/poke stays aligned after a spin.
+> - **`Runtime/View/PokeSlider.cs` (EDITED, additive)** — added a `Drive { Exploder, RotatorSpin, RotatorTilt }`
+>   enum + a `rotator` ref. Default = Exploder, so the existing explode slider is byte-identical; the two new
+>   modes drive `SkullRotator.SetSpin01/SetTilt01`.
+> - **`Editor/RotateControlBuilder.cs` (NEW)** — menu **A&P Lab/Build Rotate Control**: adds the SkullRotator to
+>   the skull root (captures home), then builds **two poke-sliders** (spin + tilt) below the explode slider,
+>   mirroring `ExplodeSliderBuilder` exactly. Re-runnable (rebuilds the "Rotate Control" root).
+> - **DESIGN CALL (diverged from the 2026-06-19 plan's "HandRaySelector input-mode"):** used SLIDERS instead of a
+>   grab-to-drag mode. `HandRaySelector` ALREADY pinch-drags any `PokeSlider`, and bones are separate
+>   `IPokeReceiver` colliders — so a slider widget **inherently can't fight bone selection** and needs ZERO ray-
+>   input changes. Lower-risk, fully one-click + inspector-tunable. (Grab-to-spin is a nicer-feel fast-follow if
+>   Brooks wants it after trying the sliders.)
+>
+> **▶️ STEPS (Brooks, ~5 min):** (a) focus Unity → recompile; tell Claude → Claude reads `Editor.log` for
+> `error CS`. (b) Run **A&P Lab/Build Rotate Control** (needs the SkullExploder already in the scene — it is),
+> then **SAVE the scene**. (c) Build APK → sideload → test: pinch-drag the **spin** slider to turn the skull all
+> the way around (centre = front), the **tilt** slider to see the top of the cranium + the base; confirm bones
+> still **glow + select correctly after rotating**, and that explode + rotate work together. **Tuning knobs:**
+> `SkullRotator.tiltMin/tiltMax` (swap to invert tilt; widen/narrow the range), move the **Rotate Control** root
+> to reposition both sliders, or edit the slider local-Y in `RotateControlBuilder` (−0.46 / −0.58) to space them.
+> **Commit the new `.cs.meta` files** once Unity generates them (focus Unity). Files touched:
+> `Runtime/View/SkullRotator.cs` (new), `Runtime/View/PokeSlider.cs` (edited), `Editor/RotateControlBuilder.cs` (new).
+>
+> **▶️ NEXT (Brooks's call):** after on-device verify of rotate → **#7 bring the LABELS back** (regenerate via
+> *A&P Lab/Generate Skeletal Labels*, re-align to the exploded bone positions; could fade in with the explode
+> slider). #5 misc tuning. Auth still deferred (publish-time).
 
 > **▶️ RESUME NEXT (session 2026-06-19 — RAY-FEEDBACK + READABILITY PASS ✅ VERIFIED ON-DEVICE; NEXT = ROTATE + LABELS):**
 > Addressed 3 of Brooks's 2026-06-17 open items — the hover gap **#1** + banner placement **#3** + text size

@@ -27,11 +27,14 @@ public static class ExplodeSliderBuilder
         }
 
         var old = GameObject.Find(RootName);
+        // Preserve a manually-repositioned slider: reuse the existing root's spot if there is one,
+        // else default to RAISED + pulled forward of the skull (the rotate sliders stack under this).
+        Vector3 pos = old != null
+            ? old.transform.position
+            : exploder.transform.position + new Vector3(0f, -0.18f, -0.22f);
         if (old != null) Undo.DestroyObjectImmediate(old);
 
         var unlit = Shader.Find("Universal Render Pipeline/Unlit");
-        // below + slightly toward the user (-Z) from the skull, so it doesn't block the bones
-        Vector3 pos = exploder.transform.position + new Vector3(0f, -0.30f, -0.12f);
 
         var root = new GameObject(RootName);
         Undo.RegisterCreatedObjectUndo(root, "Build Explode Slider");
@@ -60,10 +63,10 @@ public static class ExplodeSliderBuilder
         var tmp = labelGo.AddComponent<TextMeshPro>();
         var font = TMP_Settings.defaultFontAsset; if (font != null) tmp.font = font;
         tmp.text = "← assemble        explode →";
-        tmp.fontSize = 0.085f;
+        tmp.fontSize = 0.13f;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = new Color(1f, 0.97f, 0.85f);
-        tmp.rectTransform.sizeDelta = new Vector2(0.5f, 0.07f);
+        tmp.rectTransform.sizeDelta = new Vector2(0.75f, 0.11f);
         tmp.ForceMeshUpdate();
         labelGo.AddComponent<LabelBillboard>();
 

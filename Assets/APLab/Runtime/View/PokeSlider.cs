@@ -15,8 +15,16 @@ namespace APLab.View
     [RequireComponent(typeof(Collider))]
     public class PokeSlider : MonoBehaviour
     {
-        [Tooltip("Exploder this slider drives (0 = assembled, 1 = exploded).")]
+        public enum Drive { Exploder, RotatorSpin, RotatorTilt }
+
+        [Tooltip("What this slider controls. Exploder = open/close the skull; " +
+                 "RotatorSpin / RotatorTilt = turntable spin / tilt.")]
+        public Drive drive = Drive.Exploder;
+
+        [Tooltip("Exploder this slider drives when drive = Exploder (0 = assembled, 1 = exploded).")]
         public SkullExploder exploder;
+        [Tooltip("Rotator this slider drives when drive = RotatorSpin / RotatorTilt.")]
+        public SkullRotator rotator;
         [Tooltip("The knob that slides along the track (moved along local X).")]
         public Transform handle;
         [Tooltip("Optional fill bar (scaled along local X from the left end to the handle).")]
@@ -28,8 +36,20 @@ namespace APLab.View
 
         void OnEnable()
         {
-            if (exploder != null) value = Mathf.Clamp01(exploder.factor);
+            value = CurrentValue();   // start the handle where the driven target already is
             ApplyVisual();
+        }
+
+        // Read the current 0..1 value back from whatever this slider drives, so the handle/fill
+        // initialise in the right place (explode amount, or the rotator's spin/tilt angle).
+        float CurrentValue()
+        {
+            switch (drive)
+            {
+                case Drive.RotatorSpin: return rotator != null ? Mathf.InverseLerp(-180f, 180f, rotator.spin) : value;
+                case Drive.RotatorTilt: return rotator != null ? Mathf.InverseLerp(rotator.tiltMin, rotator.tiltMax, rotator.tilt) : value;
+                default:                return exploder != null ? Mathf.Clamp01(exploder.factor) : value;
+            }
         }
 
         void OnTriggerStay(Collider other)
@@ -48,7 +68,12 @@ namespace APLab.View
         public void SetValue(float v)
         {
             value = Mathf.Clamp01(v);
-            if (exploder != null) exploder.SetFactor(value);
+            switch (drive)
+            {
+                case Drive.RotatorSpin: if (rotator != null) rotator.SetSpin01(value); break;
+                case Drive.RotatorTilt: if (rotator != null) rotator.SetTilt01(value); break;
+                default:                if (exploder != null) exploder.SetFactor(value); break;
+            }
             ApplyVisual();
         }
 
@@ -68,10 +93,18 @@ namespace APLab.View
             }
         }
 
-#if ENABLE_LEGACY_INPUT_MANAGER
         bool _dragging;
         void Update()
         {
+            // Keep the handle/fill synced when SOMETHING ELSE drives the same target (e.g. a hand
+            // gesture driving the SkullExploder / SkullRotator), so the slider never shows a stale
+            // position. Idempotent when the slider itself is the driver.
+            if (!_dragging)
+            {
+                float cur = CurrentValue();
+                if (Mathf.Abs(cur - value) > 0.0005f) { value = cur; ApplyVisual(); }
+            }
+#if ENABLE_LEGACY_INPUT_MANAGER
             var cam = Camera.main;
             if (cam == null) return;
             if (Input.GetMouseButtonDown(0))
@@ -86,7 +119,7 @@ namespace APLab.View
                 var plane = new Plane(transform.forward, transform.position);
                 if (plane.Raycast(ray, out float d)) DriveFromWorldPoint(ray.GetPoint(d));
             }
-        }
 #endif
+        }
     }
 }

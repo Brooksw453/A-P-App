@@ -39,10 +39,36 @@ namespace APLab.View
         [Tooltip("Cursor + ray colour when over a selectable target.")]
         public Color cursorHoverColor = new Color(0.40f, 1f, 0.55f, 1f);
 
+        [Header("Hand gestures (manipulate the skull directly — in addition to the sliders)")]
+        [Tooltip("Enable one-hand grab-to-rotate + two-hand pull-apart-to-explode. PARKED (off) for now — " +
+                 "during Practice every bone is armed, so an empty-space pinch was hard to isolate from bone " +
+                 "selection (kept selecting bones). Revisit if/when bones are only selectively armed.")]
+        public bool enableGestures = false;
+        [Tooltip("Turntable driven by one-hand grab. Auto-found if empty.")]
+        public SkullRotator rotator;
+        [Tooltip("Explode driven by two-hand pull-apart. Auto-found if empty.")]
+        public SkullExploder exploder;
+        [Tooltip("Degrees of spin per metre of horizontal hand motion (negative to invert).")]
+        public float spinSensitivity = 220f;
+        [Tooltip("Degrees of tilt per metre of vertical hand motion (negative to invert).")]
+        public float tiltSensitivity = 220f;
+        [Tooltip("Explode-factor (0..1) change per metre of two-hand spread (negative to invert).")]
+        public float explodeSensitivity = 2.2f;
+
         OVRHand[] _hands;
         bool[] _pinching;
         readonly RaycastHit[] _hits = new RaycastHit[16];
         IRayHoverable[] _hovered;   // per hand — both rays highlight independently
+
+        // gesture layer state (set in Update's per-hand loop, consumed by HandleGestures)
+        enum Gesture { None, Rotate, Explode }
+        Gesture _gesture = Gesture.None;
+        bool[] _free;            // per hand: pinch is free (not on a slider or an armed target)
+        Vector3[] _handPos;      // per hand: pointer-pose position this frame
+        int _rotateHand = -1;
+        Vector3 _lastRotatePos;
+        float _explodeBaseDist, _explodeBaseFactor;
+        Camera _cam;
         MaterialPropertyBlock _curMpb;
         static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         static readonly int ColorId = Shader.PropertyToID("_Color");
@@ -54,6 +80,8 @@ namespace APLab.View
             _hands = FindObjectsByType<OVRHand>(FindObjectsSortMode.None);
             _pinching = new bool[_hands.Length];
             _hovered = new IRayHoverable[_hands.Length];
+            _free = new bool[_hands.Length];
+            _handPos = new Vector3[_hands.Length];
         }
 
         void Update()
@@ -73,6 +101,7 @@ namespace APLab.View
                 if (hand == null || !hand.IsTracked || !hand.IsPointerPoseValid)
                 {
                     Hover(h, null);                                 // drop this hand's highlight if it loses tracking
+                    _free[h] = false;
                     SetRay(line, cursor, false, Vector3.zero, Vector3.zero, false);
                     continue;
                 }
@@ -123,8 +152,17 @@ namespace APLab.View
                 }
                 else Hover(h, null);
 
+                // record this hand's pinch availability + position for the gesture layer:
+                // a pinch on a slider or an ARMED target is NOT free (it selects/drags instead).
+                bool armedTarget = recv != null &&
+                    ((recv is BoneTarget abt && abt.Armed) || (recv is QuizOption aqo && aqo.Armed));
+                _free[h] = now && slider == null && !armedTarget;
+                _handPos[h] = origin;
+
                 SetRay(line, cursor, true, origin, point, overTarget);
             }
+
+            if (enableGestures) HandleGestures();
         }
 
         // Per-hand hover so BOTH rays highlight independently. (A single shared field let the
@@ -192,6 +230,63 @@ namespace APLab.View
                     if (_hovered[i] != null) _hovered[i].SetHover(false);
                     _hovered[i] = null;
                 }
+            if (_free != null) for (int i = 0; i < _free.Length; i++) _free[i] = false;
+            _gesture = Gesture.None;
+            _rotateHand = -1;
+        }
+
+        // ===== Hand gestures: one-hand grab-to-rotate, two-hand pull-apart to explode =====
+        // A pinch that isn't on a slider or an ARMED target is "free" and feeds this layer, so
+        // selecting an armed bone / quiz answer never fights it:
+        //   • two free hands -> the inter-hand distance drives the SkullExploder (apart = explode,
+        //     together = reassemble)
+        //   • one  free hand -> the hand's motion across the view drives spin (horizontal) + tilt
+        //     (vertical), via the SkullRotator.
+        void HandleGestures()
+        {
+            if (_free == null) return;
+            if (rotator == null)  rotator  = FindFirstObjectByType<SkullRotator>(FindObjectsInactive.Include);
+            if (exploder == null) exploder = FindFirstObjectByType<SkullExploder>(FindObjectsInactive.Include);
+            if (_cam == null) { _cam = Camera.main; if (_cam == null) _cam = FindFirstObjectByType<Camera>(); }
+
+            int a = -1, b = -1, count = 0;
+            for (int h = 0; h < _free.Length; h++)
+                if (_free[h]) { if (a < 0) a = h; else if (b < 0) b = h; count++; }
+
+            if (count >= 2 && exploder != null)
+            {
+                float d = Vector3.Distance(_handPos[a], _handPos[b]);
+                if (_gesture != Gesture.Explode)
+                {
+                    _gesture = Gesture.Explode;          // grab — baseline the spread + current factor
+                    _explodeBaseDist = d;
+                    _explodeBaseFactor = exploder.factor;
+                }
+                else exploder.SetFactor(_explodeBaseFactor + (d - _explodeBaseDist) * explodeSensitivity);
+            }
+            else if (count == 1 && rotator != null && _cam != null)
+            {
+                if (_gesture != Gesture.Rotate || _rotateHand != a)
+                {
+                    _gesture = Gesture.Rotate;           // grab — baseline, no rotation applied this frame
+                    _rotateHand = a;
+                    _lastRotatePos = _handPos[a];
+                }
+                else
+                {
+                    Vector3 delta = _handPos[a] - _lastRotatePos;
+                    _lastRotatePos = _handPos[a];
+                    float dx = Vector3.Dot(delta, _cam.transform.right);   // horizontal hand motion -> spin
+                    float dy = Vector3.Dot(delta, _cam.transform.up);      // vertical hand motion   -> tilt
+                    rotator.AddSpin(-dx * spinSensitivity);
+                    rotator.AddTilt(dy * tiltSensitivity);
+                }
+            }
+            else
+            {
+                _gesture = Gesture.None;
+                _rotateHand = -1;
+            }
         }
     }
 }
