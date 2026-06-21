@@ -8,6 +8,25 @@ Keep it updated as the project evolves.
 
 ## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-21)
 
+> **▶️ ON-DEVICE TEST 2 (2026-06-21) ✅ — 3-MODE LAB WORKS · COMMITTED + PUSHED to origin/Main (`89040056`):**
+> All three modes verified on the Quest (Explore green-select + split info panels, Info Quiz, Bone Quiz);
+> banner + quiz hidden by default; mode bar lower/wider with the EXPLORE button green. The whole 3-mode
+> feature (and the prior turntable/labels work, which had only been on `meta-xr-migration`) is now on
+> **origin/Main**. **TEXT SIZE — the saga + the fix:**
+> - **Recompile-timing gotcha (important):** running **A&P Lab/Build Lab UI** *before* Unity finishes
+>   recompiling bakes STALE values into the scene (we hit this — buttons stayed 0.075 + the quiz/banner-hide
+>   didn't run, while earlier-compiled edits did). ALWAYS let Unity fully recompile first. Verify cheaply by
+>   grepping the saved scene for `m_fontSizeMax` / `m_IsActive` BEFORE building the APK.
+> - **Text enlarged:** `LabUIBuilder` now sets ALL side-panel + button text to **fontSizeMax 0.5** (autosize
+>   fills the box like Brooks's live button tweak; min floor 0.14 so the description paragraph still fits).
+> - ⚠️ **These 0.5 side-panel sizes are in the BUILDER CODE, not yet baked into the committed scene** (only
+>   Brooks's manual button 0.5 saves are in the scene YAML). **NEXT SESSION, to see big side-panel text
+>   in-headset: recompile → A&P Lab/Build Lab UI → rebuild APK.** (Deliberately did NOT hand-edit the scene
+>   YAML — avoids the `level0`-corruption history.)
+> - **Editor caveat:** the Scene-view camera sits close to the skull with the panel behind it, so panel text
+>   looks smaller in-editor than on-device — judge readability on the headset.
+> **NEXT FEATURE:** the walk-around ORBIT (controls between user↔skull, panel always behind).
+
 > **▶️ ON-DEVICE TEST 1 (2026-06-21) ✅ + POLISH PASS ⏳ NOT YET RE-VERIFIED:** The 3-mode rebuild WORKS on
 > the Quest — all three mode buttons switch correctly, click-to-select turns the bone green, the split info
 > panels populate, the quizzes run, and the back panel reads as 3 zones (Brooks: "works well… panel looks
