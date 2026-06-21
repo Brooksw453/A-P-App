@@ -78,6 +78,10 @@ namespace APLab.Core
         public string term;
         [TextArea(1, 3)] public string definition;
         public string pronunciation;
+        [Tooltip("Key bony landmarks / features to call out on the Explore info panel")]
+        public List<string> landmarks = new List<string>();
+        [Tooltip("Related / adjacent bones to cross-reference ('see also') on the info panel")]
+        public List<string> related = new List<string>();
         public AudioClip narration;
         [Tooltip("Optional offset for the label leader-line endpoint")]
         public Vector3 anchorOffset;

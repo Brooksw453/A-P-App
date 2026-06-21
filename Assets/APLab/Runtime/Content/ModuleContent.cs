@@ -27,7 +27,7 @@ namespace APLab.Content
             public JPractical practical;
             public JQuiz quiz;
         }
-        [Serializable] class JLabel { public string anchorName, term, pronunciation, definition; public string[] meshNameHints; }
+        [Serializable] class JLabel { public string anchorName, term, pronunciation, definition; public string[] meshNameHints, landmarks, related; }
         [Serializable] class JLearn { public JKeyTerm[] keyTerms; public JLearnStep[] steps; }
         [Serializable] class JKeyTerm { public string term, definition; }
         [Serializable] class JLearnStep { public string kind, prompt, targetPartName; public string[] keyTerms; }
@@ -67,6 +67,12 @@ namespace APLab.Content
                         term = l.term,
                         definition = l.definition,
                         pronunciation = l.pronunciation,
+                        landmarks = l.landmarks != null
+                            ? new System.Collections.Generic.List<string>(l.landmarks)
+                            : new System.Collections.Generic.List<string>(),
+                        related = l.related != null
+                            ? new System.Collections.Generic.List<string>(l.related)
+                            : new System.Collections.Generic.List<string>(),
                     });
             def.labels = labelSet;
 

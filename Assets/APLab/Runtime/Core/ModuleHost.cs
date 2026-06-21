@@ -46,8 +46,9 @@ namespace APLab.View
         [Tooltip("Practice-phase instruction banner (built by A&P Lab/Build Quiz Panel).")]
         public TextMeshPro instructionText;
         [Tooltip("Banner offset from the skull root: +Y is above, +Z is behind (away from the user). " +
-                 "Sits above-and-behind so it clears the exploded skull — tune live in the inspector.")]
-        public Vector3 bannerOffset = new Vector3(0f, 0.65f, 0.20f);
+                 "Sits above-and-behind so it clears the exploded skull — tune live in the inspector. " +
+                 "Pulled ~0.5 m further back now that the big back panel carries the questions.")]
+        public Vector3 bannerOffset = new Vector3(0f, 0.65f, 0.70f);
 
         ModuleRunner _runner;
         ModuleDefinition _def;
@@ -55,29 +56,46 @@ namespace APLab.View
         readonly List<BoneTarget> _all = new List<BoneTarget>();   // every target (both L/R) — used for arming
         int _stepIndex;
         int _attempts;
+        bool _loaded;
 
         void Start()
         {
             if (autoStartOnPlay) StartModule();
         }
 
+        // Legacy linear flow (Learn->Practice->Assess->Results). Kept for autoSelfTest and any scene
+        // that still wants the auto-run rubric. The new LabModeController boots into Explore instead
+        // (calls EnsureLoaded() directly), so with autoStartOnPlay=false this never runs.
         public void StartModule()
         {
-            if (contentJson == null) { Debug.LogError("[APLab] ModuleHost: contentJson not assigned."); return; }
+            if (!EnsureLoaded()) return;
+            var session = APLabManager.Instance != null ? APLabManager.Instance.Session : null;
+            Debug.Log($"[APLab] Starting module '{_def.title}' — {_targets.Count} bone targets, " +
+                      $"{_def.practical.steps.Count} practical steps.");
+            _runner.Begin(_def, session);
+        }
+
+        /// <summary>Parse the content, build the runner, gather bone targets, and find scene refs —
+        /// once (idempotent). Returns false if content is missing. LabModeController calls this before
+        /// driving the three modes; StartModule() calls it before the legacy auto-run.</summary>
+        public bool EnsureLoaded()
+        {
+            if (_loaded) return true;
+            if (contentJson == null) { Debug.LogError("[APLab] ModuleHost: contentJson not assigned."); return false; }
 
             try { _def = ModuleContentLoader.Build(contentJson.text); }
-            catch (System.Exception e) { Debug.LogError("[APLab] content load failed: " + e.Message); return; }
+            catch (System.Exception e) { Debug.LogError("[APLab] content load failed: " + e.Message); return false; }
 
             _runner = GetComponent<ModuleRunner>() ?? gameObject.AddComponent<ModuleRunner>();
-            _runner.OnPhaseChanged += OnPhase;
-            _runner.OnResults += OnResults;
+            _runner.OnPhaseChanged -= OnPhase; _runner.OnPhaseChanged += OnPhase;
+            _runner.OnResults -= OnResults;   _runner.OnResults += OnResults;
 
             GatherTargets();
             if (quizPanel == null)
                 quizPanel = FindFirstObjectByType<QuizPanel>(FindObjectsInactive.Include);
             if (modelRoot == null)
             {
-                var s = GameObject.Find("Skull");
+                var s = GameObject.Find("Skull") ?? GameObject.Find("Skull (Exploding)");
                 if (s != null) modelRoot = s.transform;
             }
             if (instructionText == null)
@@ -86,10 +104,8 @@ namespace APLab.View
                 if (b != null) instructionText = b.GetComponent<TextMeshPro>();
             }
 
-            var session = APLabManager.Instance != null ? APLabManager.Instance.Session : null;
-            Debug.Log($"[APLab] Starting module '{_def.title}' — {_targets.Count} bone targets, " +
-                      $"{_def.practical.steps.Count} practical steps.");
-            _runner.Begin(_def, session);
+            _loaded = true;
+            return true;
         }
 
         void GatherTargets()
@@ -101,9 +117,15 @@ namespace APLab.View
                 var go = GameObject.Find("Skeletal Labels");
                 if (go != null) labelsRoot = go.transform;
             }
-            if (labelsRoot == null) { Debug.LogWarning("[APLab] ModuleHost: no labelsRoot / 'Skeletal Labels'."); return; }
 
-            foreach (var t in labelsRoot.GetComponentsInChildren<BoneTarget>(true))
+            BoneTarget[] found = labelsRoot != null
+                ? labelsRoot.GetComponentsInChildren<BoneTarget>(true)
+                : System.Array.Empty<BoneTarget>();
+            if (found.Length == 0)   // exploding-skull bones carry the BoneTargets under 'Skull (Exploding)', not labelsRoot
+                found = FindObjectsByType<BoneTarget>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            if (found.Length == 0) { Debug.LogWarning("[APLab] ModuleHost: no BoneTargets found in scene."); return; }
+
+            foreach (var t in found)
             {
                 t.SetArmed(false);
                 t.Selected -= OnTargetSelected;
@@ -111,6 +133,25 @@ namespace APLab.View
                 _all.Add(t);                                       // arm every bone, both sides
                 if (!string.IsNullOrEmpty(t.anchorName)) _targets[t.anchorName] = t;  // one-per-anchor for auto-test lookup
             }
+        }
+
+        // ---- Public accessors for LabModeController (the 3-mode UI brain) ----
+        public ModuleDefinition Def => _def;
+        public QuizData Quiz => _def != null ? _def.quiz : null;
+        public IReadOnlyList<BoneTarget> AllTargets => _all;
+
+        /// <summary>Arm/disarm every bone (Explore + Bone Quiz need them clickable). Mesh-mode arming
+        /// is visually inert, so this only flips the gate that lets BoneTarget.Select() fire.</summary>
+        public void ArmAll(bool on) { foreach (var t in _all) if (t != null) t.SetArmed(on); }
+
+        /// <summary>Look up a bone's authored label (term/definition/pronunciation/landmarks/related)
+        /// by anchorName, from the already-parsed content — for filling the Explore info panels.</summary>
+        public AnatomyLabel GetLabelByAnchor(string anchor)
+        {
+            if (_def == null || _def.labels == null || _def.labels.labels == null || string.IsNullOrEmpty(anchor)) return null;
+            foreach (var l in _def.labels.labels)
+                if (l != null && string.Equals(l.anchorName, anchor, System.StringComparison.OrdinalIgnoreCase)) return l;
+            return null;
         }
 
         void OnPhase(ModulePhase phase)

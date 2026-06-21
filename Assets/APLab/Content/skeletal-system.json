@@ -1,5 +1,5 @@
 {
-  "_comment": "Skeletal System pilot content (data-driven). The A&P Lab/Build Module From Definition editor tool consumes this to generate the LabelSet, LearnSequence, PracticalTask, and QuizData for Module_Skeletal. Sources: OpenStax A&P 2e 7.2 'The Skull' (CC BY 4.0) and the author's Skull Labels.docx. Label anchorName values are matched to child meshes of the exploding-skull model via meshNameHints.",
+  "_comment": "Skeletal System pilot content (data-driven). The A&P Lab/Build Module From Definition editor tool consumes this to generate the LabelSet, LearnSequence, PracticalTask, and QuizData for Module_Skeletal. Sources: OpenStax A&P 2e 7.2 'The Skull' (CC BY 4.0) and the author's Skull Labels.docx. Label anchorName values are matched to child meshes of the exploding-skull model via meshNameHints. The Explore info panels show: definition (left), pronunciation + landmarks + related (right).",
   "slug": "skeletal-system",
   "title": "Skeletal System: Skull & Bones",
   "unit": "AP1",
@@ -12,20 +12,75 @@
   "attribution": "Adapted from OpenStax Anatomy & Physiology 2e, Section 7.2 (CC BY 4.0). Access for free at openstax.org.",
 
   "labels": [
-    { "anchorName": "Frontal bone", "meshNameHints": ["frontal"], "term": "Frontal bone", "pronunciation": "FRUN-tul", "definition": "Forms the forehead and the roof of the orbits. Contains the air-filled frontal sinus." },
-    { "anchorName": "Parietal bone", "meshNameHints": ["parietal"], "term": "Parietal bones (L & R)", "pronunciation": "puh-RY-uh-tul", "definition": "Paired bones forming most of the superior and lateral walls of the cranium. Meet at the sagittal suture." },
-    { "anchorName": "Temporal bone", "meshNameHints": ["temporal"], "term": "Temporal bones (L & R)", "pronunciation": "TEM-por-ul", "definition": "Form the lower lateral skull. House the middle and inner ear; include the mastoid process and the jaw-joint fossa." },
-    { "anchorName": "Occipital bone", "meshNameHints": ["occipital"], "term": "Occipital bone", "pronunciation": "ok-SIP-ih-tul", "definition": "Forms the back and base of the skull. Contains the foramen magnum, where the spinal cord exits." },
-    { "anchorName": "Sphenoid bone", "meshNameHints": ["sphenoid"], "term": "Sphenoid bone", "pronunciation": "SFEE-noyd", "definition": "Butterfly-shaped keystone bone of the central skull base. Its sella turcica cradles the pituitary gland." },
-    { "anchorName": "Ethmoid bone", "meshNameHints": ["ethmoid"], "term": "Ethmoid bone", "pronunciation": "ETH-moyd", "definition": "Delicate bone between the eyes forming the nasal roof and part of the septum. Its cribriform plate passes the olfactory nerves." },
-    { "anchorName": "Maxilla", "meshNameHints": ["maxilla", "maxillary"], "term": "Maxillae (L & R)", "pronunciation": "mak-SIL-uh", "definition": "Fused upper jaw bones. Hold the upper teeth and form the anterior hard palate and parts of the orbits and nose." },
-    { "anchorName": "Zygomatic bone", "meshNameHints": ["zygomatic"], "term": "Zygomatic bones (L & R)", "pronunciation": "zy-go-MAT-ik", "definition": "The cheekbones. Form the lateral cheek and orbital margin; part of the zygomatic arch." },
-    { "anchorName": "Nasal bone", "meshNameHints": ["nasal_bone", "nasal bone", "nasal"], "term": "Nasal bones (L & R)", "pronunciation": "NAY-zul", "definition": "Two small bones forming the bridge of the nose, anchoring the nasal cartilages." },
-    { "anchorName": "Lacrimal bone", "meshNameHints": ["lacrimal"], "term": "Lacrimal bones (L & R)", "pronunciation": "LAK-rih-mul", "definition": "Smallest facial bones, in the medial orbit. Help form the canal that drains tears to the nasal cavity." },
-    { "anchorName": "Palatine bone", "meshNameHints": ["palatine"], "term": "Palatine bones (L & R)", "pronunciation": "PAL-uh-tine", "definition": "Form the posterior hard palate and part of the nasal wall, separating the oral and nasal cavities." },
-    { "anchorName": "Inferior nasal concha", "meshNameHints": ["concha", "conchae", "turbinate"], "term": "Inferior nasal conchae", "pronunciation": "KONG-kuh", "definition": "Paired curved bones on the lateral nasal walls that warm, moisten, and filter inhaled air." },
-    { "anchorName": "Vomer", "meshNameHints": ["vomer"], "term": "Vomer", "pronunciation": "VOH-mer", "definition": "Slender midline bone forming the inferior, posterior part of the nasal septum." },
-    { "anchorName": "Mandible", "meshNameHints": ["mandible", "jaw"], "term": "Mandible", "pronunciation": "MAN-dih-bul", "definition": "The lower jaw — the only moveable skull bone. Articulates with the temporal bone at the temporomandibular joint (TMJ)." }
+    { "anchorName": "Frontal bone", "meshNameHints": ["frontal"], "term": "Frontal bone", "pronunciation": "FRUN-tul",
+      "definition": "Forms the forehead and the roofs of the orbits (eye sockets). Contains the air-filled frontal sinus.",
+      "landmarks": ["Frontal sinus", "Supraorbital margin", "Glabella", "Coronal suture"],
+      "related": ["Parietal bone", "Nasal bone", "Sphenoid bone", "Zygomatic bone"] },
+
+    { "anchorName": "Parietal bone", "meshNameHints": ["parietal"], "term": "Parietal bones (L & R)", "pronunciation": "puh-RY-uh-tul",
+      "definition": "Paired bones forming most of the roof and upper sides of the cranium. They meet each other at the sagittal suture.",
+      "landmarks": ["Sagittal suture", "Coronal suture", "Lambdoid suture", "Vascular grooves (inner surface)"],
+      "related": ["Frontal bone", "Occipital bone", "Temporal bone", "Sphenoid bone"] },
+
+    { "anchorName": "Temporal bone", "meshNameHints": ["temporal"], "term": "Temporal bones (L & R)", "pronunciation": "TEM-por-ul",
+      "definition": "Form the lower sides and part of the base of the cranium. House the middle and inner ear and the jaw-joint socket (TMJ).",
+      "landmarks": ["Mastoid process", "External acoustic meatus", "Zygomatic process", "Mandibular fossa (TMJ)", "Styloid process"],
+      "related": ["Parietal bone", "Occipital bone", "Sphenoid bone", "Mandible"] },
+
+    { "anchorName": "Occipital bone", "meshNameHints": ["occipital"], "term": "Occipital bone", "pronunciation": "ok-SIP-ih-tul",
+      "definition": "Forms the back and base of the skull. Its foramen magnum is where the spinal cord joins the brainstem.",
+      "landmarks": ["Foramen magnum", "Occipital condyles", "External occipital protuberance", "Lambdoid suture"],
+      "related": ["Parietal bone", "Temporal bone", "Sphenoid bone"] },
+
+    { "anchorName": "Sphenoid bone", "meshNameHints": ["sphenoid"], "term": "Sphenoid bone", "pronunciation": "SFEE-noyd",
+      "definition": "Butterfly-shaped keystone of the skull base, touching every other cranial bone. Its sella turcica holds the pituitary gland.",
+      "landmarks": ["Sella turcica", "Greater & lesser wings", "Pterygoid processes", "Optic canal", "Sphenoid sinus"],
+      "related": ["Frontal bone", "Ethmoid bone", "Temporal bone", "Occipital bone", "Parietal bone"] },
+
+    { "anchorName": "Ethmoid bone", "meshNameHints": ["ethmoid"], "term": "Ethmoid bone", "pronunciation": "ETH-moyd",
+      "definition": "Delicate bone between the eyes forming the nasal roof and upper septum. Its cribriform plate passes the smell (olfactory) nerves.",
+      "landmarks": ["Cribriform plate", "Crista galli", "Perpendicular plate", "Superior & middle nasal conchae"],
+      "related": ["Frontal bone", "Sphenoid bone", "Vomer", "Lacrimal bone", "Nasal bone"] },
+
+    { "anchorName": "Maxilla", "meshNameHints": ["maxilla", "maxillary"], "term": "Maxillae (L & R)", "pronunciation": "mak-SIL-uh",
+      "definition": "The paired maxillae form the upper jaw, holding the upper teeth and forming the front of the hard palate.",
+      "landmarks": ["Alveolar process (upper teeth)", "Maxillary sinus", "Palatine process (hard palate)", "Infraorbital foramen"],
+      "related": ["Zygomatic bone", "Nasal bone", "Lacrimal bone", "Palatine bone", "Vomer"] },
+
+    { "anchorName": "Zygomatic bone", "meshNameHints": ["zygomatic"], "term": "Zygomatic bones (L & R)", "pronunciation": "zy-go-MAT-ik",
+      "definition": "The cheekbones. Each forms the cheek prominence and part of the orbit, and helps form the zygomatic arch.",
+      "landmarks": ["Zygomatic arch", "Lateral orbital margin", "Temporal process"],
+      "related": ["Maxilla", "Temporal bone", "Frontal bone", "Sphenoid bone"] },
+
+    { "anchorName": "Nasal bone", "meshNameHints": ["nasal_bone", "nasal bone", "nasal"], "term": "Nasal bones (L & R)", "pronunciation": "NAY-zul",
+      "definition": "Two small bones that join at the midline to form the bridge of the nose and anchor the nasal cartilages.",
+      "landmarks": ["Nasal bridge", "Internasal suture", "Inferior border (cartilage attachment)"],
+      "related": ["Frontal bone", "Maxilla", "Ethmoid bone"] },
+
+    { "anchorName": "Lacrimal bone", "meshNameHints": ["lacrimal"], "term": "Lacrimal bones (L & R)", "pronunciation": "LAK-rih-mul",
+      "definition": "The smallest facial bones, in the medial wall of each orbit. They help form the canal that drains tears into the nose.",
+      "landmarks": ["Lacrimal groove / fossa", "Nasolacrimal canal", "Posterior lacrimal crest"],
+      "related": ["Maxilla", "Ethmoid bone", "Frontal bone"] },
+
+    { "anchorName": "Palatine bone", "meshNameHints": ["palatine"], "term": "Palatine bones (L & R)", "pronunciation": "PAL-uh-tine",
+      "definition": "Paired bones forming the back of the hard palate and part of the nasal wall, separating the mouth and nasal cavity.",
+      "landmarks": ["Horizontal plate (hard palate)", "Perpendicular plate", "Greater palatine foramen"],
+      "related": ["Maxilla", "Sphenoid bone", "Vomer", "Inferior nasal concha"] },
+
+    { "anchorName": "Inferior nasal concha", "meshNameHints": ["concha", "conchae", "turbinate"], "term": "Inferior nasal conchae", "pronunciation": "KONG-kuh",
+      "definition": "Paired scroll-like bones on the lateral nasal walls that warm, moisten, and filter the air you breathe in.",
+      "landmarks": ["Scroll (curved) shape", "Lateral nasal wall attachment", "Vascular mucosa"],
+      "related": ["Maxilla", "Palatine bone", "Ethmoid bone", "Lacrimal bone"] },
+
+    { "anchorName": "Vomer", "meshNameHints": ["vomer"], "term": "Vomer", "pronunciation": "VOH-mer",
+      "definition": "A slender midline bone forming the lower part of the nasal septum, dividing the nasal cavity in two.",
+      "landmarks": ["Forms inferior nasal septum", "Superior border (sphenoid/ethmoid)", "Inferior border (maxilla/palatine)"],
+      "related": ["Ethmoid bone", "Sphenoid bone", "Maxilla", "Palatine bone"] },
+
+    { "anchorName": "Mandible", "meshNameHints": ["mandible", "jaw"], "term": "Mandible", "pronunciation": "MAN-dih-bul",
+      "definition": "The lower jaw — the only moveable skull bone. It holds the lower teeth and hinges at the temporal bones (TMJ).",
+      "landmarks": ["Mandibular condyle (TMJ)", "Body & ramus", "Mental foramen", "Alveolar process (lower teeth)", "Angle of the mandible"],
+      "related": ["Temporal bone", "Maxilla"] }
   ],
 
   "learn": {
@@ -54,13 +109,18 @@
       { "kind": "IdentifyPart", "instruction": "Select the butterfly-shaped keystone bone at the central skull base.", "correctKey": "Sphenoid bone", "weight": 1.0, "hint": "It cradles the pituitary gland in the sella turcica." },
       { "kind": "IdentifyPart", "instruction": "Select a cheekbone.", "correctKey": "Zygomatic bone", "weight": 1.0, "hint": "It forms the lateral cheek and part of the orbit." },
       { "kind": "IdentifyPart", "instruction": "Select the bone that forms the forehead.", "correctKey": "Frontal bone", "weight": 1.0, "hint": "It also roofs the orbits." },
+      { "kind": "IdentifyPart", "instruction": "Select the bone that houses the middle and inner ear.", "correctKey": "Temporal bone", "weight": 1.0, "hint": "It also forms the socket of the jaw joint (TMJ)." },
+      { "kind": "IdentifyPart", "instruction": "Select the bone that forms the bridge of the nose.", "correctKey": "Nasal bone", "weight": 1.0, "hint": "Two small bones meet at the midline." },
+      { "kind": "IdentifyPart", "instruction": "Select the paired bone that forms the roof and upper sides of the cranium.", "correctKey": "Parietal bone", "weight": 1.0, "hint": "The pair meets at the sagittal suture." },
+      { "kind": "IdentifyPart", "instruction": "Select the upper jaw, which holds the upper teeth.", "correctKey": "Maxilla", "weight": 1.0, "hint": "It also forms the anterior hard palate." },
+      { "kind": "IdentifyPart", "instruction": "Select the bone that forms the posterior part of the hard palate.", "correctKey": "Palatine bone", "weight": 1.0, "hint": "It sits behind the maxilla, between the oral and nasal cavities." },
       { "kind": "PlaceInSocket", "instruction": "Reassemble the skull: place the mandible into its socket on the skull.", "correctKey": "Mandible_Socket", "weight": 1.5, "hint": "It hinges at the temporal bones." }
     ]
   },
 
   "quiz": {
     "quizName": "Skull Bones",
-    "questionsPerRound": 5,
+    "questionsPerRound": 10,
     "pointsPerCorrectAnswer": 20,
     "questions": [
       { "questionText": "The foramen magnum, which allows passage of the spinal cord, is an opening in which bone?", "answerOptions": ["Occipital bone", "Temporal bone", "Sphenoid bone", "Frontal bone"], "correctAnswerIndex": 0 },
@@ -69,7 +129,13 @@
       { "questionText": "The cheekbones are formed by the:", "answerOptions": ["Nasal bones", "Lacrimal bones", "Zygomatic bones", "Palatine bones"], "correctAnswerIndex": 2 },
       { "questionText": "How many bones make up the brain case (cranium)?", "answerOptions": ["6", "8", "14", "22"], "correctAnswerIndex": 1 },
       { "questionText": "The cribriform plate, which transmits the olfactory nerves, is part of which bone?", "answerOptions": ["Vomer", "Sphenoid bone", "Ethmoid bone", "Frontal bone"], "correctAnswerIndex": 2 },
-      { "questionText": "Which suture joins the two parietal bones at the midline?", "answerOptions": ["Coronal suture", "Sagittal suture", "Lambdoid suture", "Squamous suture"], "correctAnswerIndex": 1 }
+      { "questionText": "Which suture joins the two parietal bones at the midline?", "answerOptions": ["Coronal suture", "Sagittal suture", "Lambdoid suture", "Squamous suture"], "correctAnswerIndex": 1 },
+      { "questionText": "Which bone forms the bridge of the nose?", "answerOptions": ["Nasal bones", "Vomer", "Lacrimal bones", "Maxillae"], "correctAnswerIndex": 0 },
+      { "questionText": "The posterior part of the hard palate is formed by the maxillae and which other bones?", "answerOptions": ["Palatine bones", "Nasal bones", "Zygomatic bones", "Temporal bones"], "correctAnswerIndex": 0 },
+      { "questionText": "Which bone houses the structures of the middle and inner ear?", "answerOptions": ["Temporal bone", "Occipital bone", "Sphenoid bone", "Parietal bone"], "correctAnswerIndex": 0 },
+      { "questionText": "The inferior part of the nasal septum is formed by the:", "answerOptions": ["Vomer", "Ethmoid bone", "Mandible", "Palatine bone"], "correctAnswerIndex": 0 },
+      { "questionText": "The mandible articulates with the skull at the TMJ on which bone?", "answerOptions": ["Temporal bone", "Zygomatic bone", "Maxilla", "Sphenoid bone"], "correctAnswerIndex": 0 },
+      { "questionText": "Tears drain from the eye to the nasal cavity through a canal formed in part by which bone?", "answerOptions": ["Lacrimal bone", "Nasal bone", "Vomer", "Palatine bone"], "correctAnswerIndex": 0 }
     ]
   }
 }

@@ -37,7 +37,10 @@ namespace APLab.View
         bool _locked, _auto;
         Action<int, int> _onComplete;
 
-        void Awake() => gameObject.SetActive(false);   // shown only during Assess
+        // Visibility is managed externally now: the UI builders leave this panel INACTIVE in the
+        // scene, and LabModeController (Info Quiz) / ModuleHost (Assess) activate it via Begin().
+        // No self-disable in Awake — that would fight an external SetActive(true) when the panel
+        // starts inactive (Awake fires during the first activation and would immediately re-hide it).
 
         /// <summary>
         /// Run a quiz round. <paramref name="onComplete"/>(correct, total) fires when

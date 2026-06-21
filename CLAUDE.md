@@ -6,7 +6,65 @@ Keep it updated as the project evolves.
 
 ---
 
-## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-20)
+## 0. ⏭️ RESUME HERE — first move in a fresh chat (latest: 2026-06-21)
+
+> **▶️ ON-DEVICE TEST 1 (2026-06-21) ✅ + POLISH PASS ⏳ NOT YET RE-VERIFIED:** The 3-mode rebuild WORKS on
+> the Quest — all three mode buttons switch correctly, click-to-select turns the bone green, the split info
+> panels populate, the quizzes run, and the back panel reads as 3 zones (Brooks: "works well… panel looks
+> great"). Brooks's fixes from test 1, now applied (CODE + content; **must re-run A&P Lab/Build Lab UI**):
+> - **Info-panel + button text was unreadably tiny** (the #1 issue) — TMP autosize was shrinking it to ~0.045.
+>   Fixed: font sizes greatly increased (title 0.24 / body 0.18 / pron 0.22 / landmarks+related 0.16 / status
+>   0.20 / buttons 0.17), side panels + boxes enlarged (Mid 1.45×1.80, Side 1.28×1.80), and the JSON
+>   descriptions shortened to 1–2 sentences (~110 chars) so the big font fits. All sizes are tunable knobs in
+>   `LabUIBuilder` (re-run to apply — the builder bakes them into the scene objects).
+> - **Old black instruction banner still showed at runtime** → retired: `LabUIBuilder` disables it + the
+>   controller force-hides it every mode.
+> - **Quiz + banner OFF by default** → builder sets both inactive in the scene; `QuizPanel.Awake` no longer
+>   self-hides (it would fight starting-inactive), so the controller/Begin own its visibility; quiz shows only
+>   on INFO QUIZ.
+> - **Info-Quiz panel was too close** → now moved to the back-panel depth (`LabModeController.backPanelRoot`).
+> **▶️ TO APPLY:** recompile → **A&P Lab/Build Lab UI** → SAVE → rebuild APK → sideload. (A recompile alone
+> won't resize the panel — the font/size changes are baked by Build Lab UI.)
+
+> **▶️ RESUME NEXT (session 2026-06-21 — 3-MODE EXPLORATORY REBUILD; ✅ ON-DEVICE TEST 1 PASSED — see note above):**
+> Brooks's redesign: make the app a **skull EXPLORER first**, with the quiz + bone-ID demoted to opt-in
+> activities toggled from a **3-button mode bar**. Built code-only (one new menu command). The old linear
+> auto-run rubric is retired at boot (it stays available via `autoStartOnPlay` for the editor self-test).
+> - **EXPLORE (default):** hover = cyan (as before); **click a bone = persistent GREEN** (single-selection),
+>   and two **split** side info panels fill — LEFT = term + expanded description, RIGHT = pronunciation +
+>   key landmarks + related ("see also") bones. Sourced from the parsed JSON (no re-parse).
+> - **INFO QUIZ:** hides skull/labels/sliders/panels, runs the existing `QuizPanel` (now **10** Qs/round from
+>   a **13-question** bank), shows the score, returns to Explore.
+> - **BONE QUIZ:** prompt ("Select the bone that…") shows on BOTH side panels; click the correct bone;
+>   correct=green/wrong=red flash; advances through **10** IdentifyPart prompts; score; returns. **Labels are
+>   hidden in this mode so the answer isn't given away.**
+> - **Big transparent back panel** behind the skull (light-grey middle backdrop + 2 darker info panels L/R +
+>   the mode bar along the bottom). Banner pulled **~0.5 m back** (`bannerOffset.z` 0.20→0.70; it's hidden in
+>   all modes now — the panels carry the text). **ORBIT/turntable deferred by choice (next pass).**
+>
+> **NEW files:** `Runtime/View/LabModeController.cs` (the 3-mode brain), `Runtime/View/ModeButton.cs` (pokeable
+> toggle, clone of QuizOption's contract), `Editor/LabUIBuilder.cs` (menu **A&P Lab/Build Lab UI**),
+> `Shaders/PanelGlass.shader` (URP transparent unlit — URP/Unlit ignores alpha, so the glass needs this).
+> **EDITED:** `View/BoneTarget.cs` (+persistent green `SetSelected`, selection-aware hover/flash),
+> `Core/ModuleHost.cs` (`StartModule`→idempotent `EnsureLoaded`; accessors `Def/Quiz/AllTargets/ArmAll/
+> GetLabelByAnchor`; robust target-gather; `bannerOffset` default 0.70), `Content/ModuleContent.cs` +
+> `Core/ModuleModels.cs` (AnatomyLabel/JLabel gain `landmarks`+`related`), `Content/skeletal-system.json`
+> (expanded paragraph descriptions + landmarks/related from `Skull Labels.docx`; 13-Q bank @ 10/round; 10
+> IdentifyPart prompts).
+>
+> **▶️ STEPS (Brooks):** (1) focus Unity → recompile (+ import `PanelGlass.shader`); tell Claude → reads
+> `Editor.log` for `error CS` / shader errors. (2) Run **A&P Lab/Validate Skeletal Content** (optional — parses
+> the new JSON, logs each bone-quiz correctKey). (3) Run **A&P Lab/Build Lab UI** → **SAVE** the scene.
+> (4) On **Module Host**: confirm `autoStartOnPlay = OFF` and the new **LabModeController** has all refs
+> assigned (panels, 3 buttons, Skull (Exploding)/Bone Labels/Explode Slider/Rotate Control/Quiz Panel — the
+> builder finds them by name; assign any that warn as null). (5) Build APK → Claude sideloads + screenshots.
+> TEST per mode: Explore (3 transparent zones; click holds green; L=description, R=pron/landmarks/related;
+> single-selection; green survives ray-away) · Info Quiz (10 Qs, score, return) · Bone Quiz (skull on, **names
+> hidden**, prompt on both panels, flash, score, return) · rapid mode switches leave no stale green/options.
+> **Tuning (live):** nudge the **Lab Back Panel** root (size/depth as a unit), `LabModeController` timings,
+> font sizes in `LabUIBuilder` (re-run). **GOTCHA:** verify panel **transparency ON-DEVICE** (the URP/Unlit
+> alpha trap). Do **NOT** re-run *Setup Exploding Skull* (reverts to full-res meshes). **NEXT after verify:
+> the walk-around ORBIT** (controls between user↔skull, panel always behind).
 
 > **▶️ RESUME NEXT (session 2026-06-20 #7 — LABELS ROTATE WITH THE SKULL; ⏳ NOT YET ON-DEVICE):**
 > On-device #6: declutter worked (labels spread + readable) ✅. But labels DIDN'T rotate with the skull — spinning

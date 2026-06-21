@@ -33,11 +33,13 @@ namespace APLab.View
         static readonly Color Right  = new Color(0.35f, 1f, 0.45f, 1f);
         static readonly Color Wrong  = new Color(1f, 0.35f, 0.3f, 1f);
         static readonly Color Hover  = new Color(0.55f, 0.9f, 1f, 1f);    // ray hover — glows via emission
+        static readonly Color Selected_ = new Color(0.30f, 1f, 0.45f, 1f); // persistent click-select (Explore mode)
 
         Renderer _renderer;
         Coroutine _flash;
         MaterialPropertyBlock _mpb;
         bool _emissionReady;
+        bool _selected;                  // held green (Explore); survives hover changes
         const float EmissionBoost = 1.4f;
         static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         static readonly int ColorId = Shader.PropertyToID("_Color");
@@ -56,11 +58,27 @@ namespace APLab.View
             if (_flash == null) ApplyColor(on ? Armed_ : Dim);
         }
 
-        /// <summary>Ray-hover highlight (mesh mode only); ignored while a flash is playing.</summary>
+        /// <summary>Ray-hover highlight (mesh mode only); ignored while a flash is playing.
+        /// Un-hovering restores the held green if this bone is currently selected (Explore).</summary>
         public void SetHover(bool on)
         {
             if (!meshMode || _flash != null) return;
-            if (on) SetBlockColor(Hover); else ClearBlock();
+            if (on) SetBlockColor(Hover);
+            else if (_selected) SetBlockColor(Selected_);
+            else ClearBlock();
+        }
+
+        /// <summary>True while this bone is the current Explore-mode selection.</summary>
+        public bool IsSelected => _selected;
+
+        /// <summary>Persistent green "selected" highlight for Explore mode. Held until cleared
+        /// (single-selection is managed by LabModeController). Distinct from the transient
+        /// correct/wrong flash and from the cyan hover.</summary>
+        public void SetSelected(bool on)
+        {
+            _selected = on;
+            if (!meshMode || _flash != null) return;   // a flash, if any, restores the right state on finish
+            if (on) SetBlockColor(Selected_); else ClearBlock();
         }
 
         /// <summary>Invoked by any input source (poke tip, ray, mouse).</summary>
@@ -97,7 +115,8 @@ namespace APLab.View
             SetBlockColor(c);
             yield return new WaitForSeconds(0.6f);
             _flash = null;
-            ClearBlock();
+            if (_selected) SetBlockColor(Selected_);   // a selected bone keeps its green after a flash
+            else ClearBlock();
         }
 
         void SetBlockColor(Color c)
